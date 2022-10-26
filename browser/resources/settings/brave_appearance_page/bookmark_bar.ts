@@ -20,7 +20,6 @@ enum BookmarkBarState {
   NTP = 2,
 }
 
-
 /**
  * 'settings-brave-appearance-bookmark-bar' is the settings page area containing
  * brave's bookmark bar visibility settings in appearance settings.
@@ -36,11 +35,6 @@ export class SettingsBraveAppearanceBookmarkBarElement extends SettingsBraveAppe
 
   static get properties() {
     return {
-      bookmarkBarShowOptions_: {
-        readOnly: false,
-        type: String,
-      },
-
       /** @private {chrome.settingsPrivate.PrefType} */
       bookmarkBarStatePref_: {
         key: '',
@@ -49,13 +43,15 @@ export class SettingsBraveAppearanceBookmarkBarElement extends SettingsBraveAppe
           return {
             key: '',
             type: chrome.settingsPrivate.PrefType.NUMBER,
-            value: BookmarkBarState.ALWAYS
+            value: BookmarkBarState.NTP
           }
         }
       }
     }
   }
+
   bookmarkBarStatePref_: chrome.settingsPrivate.PrefObject
+
   private bookmarkBarShowOptions_ = [
     {value: BookmarkBarState.ALWAYS, name: this.i18n('appearanceSettingsBookmarBarAlways')},
     {value: BookmarkBarState.NONE, name: this.i18n('appearanceSettingsBookmarBarNever')},
@@ -65,33 +61,54 @@ export class SettingsBraveAppearanceBookmarkBarElement extends SettingsBraveAppe
 
   static get observers() {
     return [
-      'onShowOptionChanged_(prefs)'
+      'onPrefsChanged_(prefs.bookmark_bar.show_on_all_tabs.value, prefs.brave.always_show_bookmark_bar_on_ntp.value)'
     ]
   }
 
-  private getBookmarkBarState(): BookmarkBarState {
-    if (this.get('prefs.bookmark_bar.show_on_all_tabs.value'))
+  override ready() {
+    super.ready()
+    window.addEventListener('load', this.onLoad_.bind(this));
+  }
+  /** @private **/
+  onLoad_() {
+    this.setControlValueFromPrefs()
+  }
+
+  private getBookmarkBarStateFromPrefs(): BookmarkBarState {
+    if (this.getPref('bookmark_bar.show_on_all_tabs').value)
       return BookmarkBarState.ALWAYS
 
-    if (this.get('prefs.brave.always_show_bookmark_bar_on_ntp.value'))
+    if (this.getPref('brave.always_show_bookmark_bar_on_ntp').value)
       return BookmarkBarState.NTP
     return BookmarkBarState.NONE
   }
-  private setBookmarkBarState(state: BookmarkBarState) {
+
+  private saveBookmarkBarStateToPrefs(state: BookmarkBarState) {
     if (state === BookmarkBarState.ALWAYS) {
-      this.set('prefs.bookmark_bar.show_on_all_tabs.value', true)
+      this.setPrefValue('bookmark_bar.show_on_all_tabs', true)
     } else if (state === BookmarkBarState.NTP) {
-      this.set('prefs.bookmark_bar.show_on_all_tabs.value', false)
-      this.set('prefs.brave.always_show_bookmark_bar_on_ntp.value', true)
+      this.setPrefValue('bookmark_bar.show_on_all_tabs', false)
+      this.setPrefValue('brave.always_show_bookmark_bar_on_ntp', true)
     } else {
-      this.set('prefs.bookmark_bar.show_on_all_tabs.value', false)
-      this.set('prefs.brave.always_show_bookmark_bar_on_ntp.value', false)
+      this.setPrefValue('bookmark_bar.show_on_all_tabs', false)
+      this.setPrefValue('brave.always_show_bookmark_bar_on_ntp', false)
     }
   }
+  private setControlValueFromPrefs() {
+    const state = this.getBookmarkBarStateFromPrefs()
+    if (this.bookmarkBarStatePref_.value === state)
+      return
+    this.bookmarkBarStatePref_ = {
+      key: '',
+      type: chrome.settingsPrivate.PrefType.NUMBER,
+      value: state
+    };
+  }
+  private onPrefsChanged_() {
+    this.setControlValueFromPrefs()
+  }
   private onShowOptionChanged_() {
-    this.setBookmarkBarState(this.bookmarkBarStatePref_.value)
-
-    const state = this.getBookmarkBarState()
+    const state = this.bookmarkBarStatePref_.value
     if (state === BookmarkBarState.ALWAYS) {
       this.bookmarkBarShowEnabledLabel_ = this.i18n('appearanceSettingsBookmarBarAlwaysDesc')
     } else if (state === BookmarkBarState.NTP) {
@@ -99,12 +116,8 @@ export class SettingsBraveAppearanceBookmarkBarElement extends SettingsBraveAppe
     } else {
       this.bookmarkBarShowEnabledLabel_ = this.i18n('appearanceSettingsBookmarBarNeverDesc')
     }
-    const pref = {
-      key: '',
-      type: chrome.settingsPrivate.PrefType.NUMBER,
-      value: state
-    };
-    this.bookmarkBarStatePref_ = pref;
+
+    this.saveBookmarkBarStateToPrefs(this.bookmarkBarStatePref_.value)
   }
 
 }

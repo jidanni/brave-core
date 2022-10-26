@@ -105,7 +105,7 @@
     Bookmark bar is visible on all pages
   </message>
   <message name="IDS_SETTINGS_ALWAYS_SHOW_BOOKMARK_BAR_ON_NTP" desc="The label for settings switch controlling the visibility of bookmarks bar on NTP">
-    Only in the new tab page
+    Only on the new tab page
   </message>
   <message name="IDS_SETTINGS_ALWAYS_SHOW_BOOKMARK_BAR_ON_NTP_DESC" desc="The label for settings switch controlling the visibility of bookmarks bar on NTP description">
     Bookmark bar is hidden on all pages except the new tab page
