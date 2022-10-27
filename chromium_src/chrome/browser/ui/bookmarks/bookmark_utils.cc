@@ -3,8 +3,14 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+#include "chrome/browser/ui/bookmarks/bookmark_utils.h"
+#include "brave/components/constants/pref_names.h"
 #include "build/build_config.h"
 #include "chrome/grit/theme_resources.h"
+#include "components/bookmarks/common/bookmark_pref_names.h"
+#include "components/prefs/pref_service.h"
+#include "components/user_prefs/user_prefs.h"
+#include "content/public/browser/browser_context.h"
 #include "ui/base/resource/resource_bundle.h"
 #include "ui/color/color_id.h"
 #include "ui/color/color_provider.h"
@@ -18,8 +24,24 @@
 #define GetBookmarkFolderIcon GetBookmarkFolderIcon_UnUsed
 #endif
 
+#define ToggleBookmarkBarWhenVisible                                  \
+  ToggleBookmarkBarWhenVisible_ChromiumImpl(                          \
+      content::BrowserContext* browser_context);                      \
+  void ToggleBookmarkBarWhenVisible(                                  \
+      content::BrowserContext* browser_context) {                     \
+    PrefService* prefs = user_prefs::UserPrefs::Get(browser_context); \
+    const bool always_show =                                          \
+        prefs->GetBoolean(bookmarks::prefs::kShowBookmarkBar);        \
+    if (always_show) {                                                \
+      prefs->SetBoolean(kAlwaysShowBookmarkBarOnNTP, false);          \
+    }                                                                 \
+    ToggleBookmarkBarWhenVisible_ChromiumImpl(browser_context);       \
+  }                                                                   \
+  void ToggleBookmarkBarWhenVisible_ChromiumImpl
+
 #include "src/chrome/browser/ui/bookmarks/bookmark_utils.cc"
 
+#undef ToggleBookmarkBarWhenVisible
 #undef IsAppsShortcutEnabled
 #undef ShouldShowAppsShortcutInBookmarkBar
 
