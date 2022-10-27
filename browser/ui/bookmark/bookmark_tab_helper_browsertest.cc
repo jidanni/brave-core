@@ -84,19 +84,16 @@ IN_PROC_BROWSER_TEST_F(BookmarkTabHelperBrowserTest, BookmarkBarOnNTPTest) {
   chrome::ToggleBookmarkBar(browser());
   EXPECT_EQ(BookmarkBar::SHOW, browser()->bookmark_bar_state());
   chrome::ToggleBookmarkBar(browser());
-  EXPECT_EQ(BookmarkBar::SHOW, browser()->bookmark_bar_state());
-
-  // Turn off showing bookmark bar on NTP.
-  profile->GetPrefs()->SetBoolean(kAlwaysShowBookmarkBarOnNTP, false);
-
-  // Check bookmark bar on NTP is hidden.
   EXPECT_EQ(BookmarkBar::HIDDEN, browser()->bookmark_bar_state());
+  EXPECT_FALSE(profile->GetPrefs()->GetBoolean(kAlwaysShowBookmarkBarOnNTP));
+  // Turn off showing bookmark bar on NTP.
+  profile->GetPrefs()->SetBoolean(kAlwaysShowBookmarkBarOnNTP, true);
+
+  // Check bookmark bar on NTP is visible when kAlwaysShowBookmarkBarOnNTP pref
+  // is on.
+  EXPECT_EQ(BookmarkBar::SHOW, browser()->bookmark_bar_state());
 
   // Check bookmark bar on NTP is visible when kBookmarkBar pref is on.
   chrome::ToggleBookmarkBar(browser());
   EXPECT_EQ(BookmarkBar::SHOW, browser()->bookmark_bar_state());
-
-  // Check bookmark bar on NTP is hidden when kBookmarkBar pref is off.
-  chrome::ToggleBookmarkBar(browser());
-  EXPECT_EQ(BookmarkBar::HIDDEN, browser()->bookmark_bar_state());
 }
