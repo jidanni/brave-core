@@ -72,6 +72,11 @@ bool ParseRequestPermissionsParams(
     const std::string& json,
     std::vector<std::string>* restricted_methods);
 
+bool ParseEthSubscribeParams(const std::string& json,
+                             std::string* event_type);
+bool ParseEthUnsubscribeParams(const std::string& json,
+                               std::string* subscription_id);
+
 }  // namespace brave_wallet
 
 #endif  // BRAVE_COMPONENTS_BRAVE_WALLET_COMMON_ETH_REQUEST_HELPER_H_

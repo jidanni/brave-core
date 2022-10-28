@@ -44,6 +44,7 @@ class JSEthereumProvider final : public gin::Wrappable<JSEthereumProvider>,
   // mojom::EventsListener
   void AccountsChangedEvent(const std::vector<std::string>& accounts) override;
   void ChainChangedEvent(const std::string& chain_id) override;
+  void MessageEvent(const std::string& subscription_id, const std::string& message) override;
 
  private:
   explicit JSEthereumProvider(content::RenderFrame* render_frame);

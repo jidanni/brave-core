@@ -674,4 +674,39 @@ bool ParseRequestPermissionsParams(
   return true;
 }
 
+bool ParseEthSubscribeParams(const std::string& json,
+                             std::string* event_type) {
+  if (!event_type)
+    return false;
+
+  auto list = GetParamsList(json);
+  if (!list || list->size() != 1)
+    return false;
+
+  const std::string* event_type_str = (*list)[0].GetIfString();
+  if (!event_type_str)
+    return false;
+
+  *event_type = *event_type_str;
+  return true;
+}
+
+bool ParseEthUnsubscribeParams(const std::string& json,
+                               std::string* subscription_id) {
+  if (!subscription_id)
+    return false;
+
+  auto list = GetParamsList(json);
+  if (!list || list->size() != 1)
+    return false;
+
+  const std::string* subscription_id_str = (*list)[0].GetIfString();
+  if (!subscription_id_str)
+    return false;
+
+  *subscription_id = *subscription_id_str;
+  return true;
+}
+
+
 }  // namespace brave_wallet
