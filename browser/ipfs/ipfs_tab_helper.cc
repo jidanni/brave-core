@@ -100,10 +100,13 @@ void IPFSTabHelper::IPFSResourceLinkResolved(const GURL& ipfs) {
   UpdateLocationBar();
 }
 
-void IPFSTabHelper::DNSLinkResolved(const GURL& ipfs) {
+void IPFSTabHelper::DNSLinkResolved(const GURL& ipfs, bool is_gateway_url) {
   DCHECK(!ipfs.is_valid() || ipfs.SchemeIs(kIPNSScheme));
   ipfs_resolved_url_ = ipfs.is_valid() ? ipfs : GURL();
-  if (ipfs.is_valid() && pref_service_->GetBoolean(kIPFSAutoRedirectDNSLink)) {
+  bool should_redirect =
+      (is_gateway_url && pref_service_->GetBoolean(kIPFSAutoRedirectGateway)) ||
+      (!is_gateway_url && pref_service_->GetBoolean(kIPFSAutoRedirectDNSLink));
+  if (ipfs.is_valid() && should_redirect) {
     LoadUrl(GetIPFSResolvedURL());
     return;
   }
@@ -111,12 +114,14 @@ void IPFSTabHelper::DNSLinkResolved(const GURL& ipfs) {
 }
 
 void IPFSTabHelper::HostResolvedCallback(
+    const GURL& current,
+    const GURL& check_url,
+    bool is_gateway_url,
     absl::optional<std::string> x_ipfs_path_header,
     const std::string& host,
     const absl::optional<std::string>& dnslink) {
-  GURL current = web_contents()->GetURL();
-
-  if (current.host() != host || !current.SchemeIsHTTPOrHTTPS())
+  if (current.host() != web_contents()->GetURL().host() ||
+      !current.SchemeIsHTTPOrHTTPS())
     return;
   if (!dnslink || dnslink.value().empty()) {
     if (x_ipfs_path_header) {
@@ -125,7 +130,7 @@ void IPFSTabHelper::HostResolvedCallback(
     return;
   }
 
-  DNSLinkResolved(ResolveDNSLinkUrl(current));
+  DNSLinkResolved(ResolveDNSLinkUrl(check_url), is_gateway_url);
 }
 
 void IPFSTabHelper::LoadUrl(const GURL& gurl) {
@@ -164,16 +169,19 @@ GURL IPFSTabHelper::GetIPFSResolvedURL() const {
 }
 
 void IPFSTabHelper::CheckDNSLinkRecord(
+    const GURL& target,
+    bool is_gateway_url,
     absl::optional<std::string> x_ipfs_path_header) {
-  GURL current = web_contents()->GetURL();
-  if (!current.SchemeIsHTTPOrHTTPS())
+  if (!target.SchemeIsHTTPOrHTTPS())
     return;
 
-  const auto& host_port_pair = net::HostPortPair::FromURL(current);
+  const auto& host_port_pair = net::HostPortPair::FromURL(target);
 
-  auto resolved_callback = base::BindOnce(&IPFSTabHelper::HostResolvedCallback,
-                                          weak_ptr_factory_.GetWeakPtr(),
-                                          std::move(x_ipfs_path_header));
+  auto resolved_callback =
+      base::BindOnce(&IPFSTabHelper::HostResolvedCallback,
+                     weak_ptr_factory_.GetWeakPtr(), web_contents()->GetURL(),
+                     target, is_gateway_url, std::move(x_ipfs_path_header));
+
   const auto& network_anonymization_key =
       web_contents()->GetPrimaryMainFrame()
           ? web_contents()
@@ -245,7 +253,7 @@ absl::optional<GURL> IPFSTabHelper::ResolveIPFSUrlFromGatewayLikeUrl(
   if (!api_gateway &&
       // Make sure we don't infinite redirect
       !gurl.DomainIs(base_gateway.host()) && !net::IsLocalhost(gurl)) {
-    return ipfs::TranslateToCurrentGatewayUrl(gurl);
+    return ipfs::ExtractSourceFromGateway(gurl);
   }
 
   return absl::nullopt;
@@ -262,19 +270,22 @@ void IPFSTabHelper::MaybeCheckDNSLinkRecord(
     const net::HttpResponseHeaders* headers) {
   UpdateDnsLinkButtonState();
   auto current_url = GetCurrentPageURL();
+  auto dnslink_target = current_url;
 
   auto possible_redirect = ResolveIPFSUrlFromGatewayLikeUrl(current_url);
-  if (possible_redirect) {
+  if (possible_redirect && IsIPFSScheme(possible_redirect.value())) {
     if (IsAutoRedirectIPFSResourcesEnabled()) {
       LoadUrl(possible_redirect.value());
     } else {
       IPFSResourceLinkResolved(possible_redirect.value());
     }
     return;
+  } else if (possible_redirect) {
+    dnslink_target = possible_redirect.value();
   }
 
   if (!IsDNSLinkCheckEnabled() || !headers || ipfs_resolved_url_.is_valid() ||
-      !CanResolveURL(current_url)) {
+      !CanResolveURL(dnslink_target)) {
     return;
   }
 
@@ -282,10 +293,15 @@ void IPFSTabHelper::MaybeCheckDNSLinkRecord(
   std::string normalized_header;
   if ((response_code >= net::HttpStatusCode::HTTP_INTERNAL_SERVER_ERROR &&
        response_code <= net::HttpStatusCode::HTTP_VERSION_NOT_SUPPORTED)) {
-    CheckDNSLinkRecord(absl::nullopt);
+    CheckDNSLinkRecord(dnslink_target, possible_redirect.has_value(),
+                       absl::nullopt);
   } else if (headers->GetNormalizedHeader(kIfpsPathHeader,
                                           &normalized_header)) {
-    CheckDNSLinkRecord(normalized_header);
+    CheckDNSLinkRecord(dnslink_target, possible_redirect.has_value(),
+                       normalized_header);
+  } else if (possible_redirect) {
+    CheckDNSLinkRecord(dnslink_target, possible_redirect.has_value(),
+                       absl::nullopt);
   }
 }
 
