@@ -16,12 +16,12 @@
 #include "bat/ads/history_filter_types.h"
 #include "bat/ads/history_item_info.h"
 #include "bat/ads/history_sort_types.h"
-#include "bat/ads/internal/account/account_observer.h"
 #include "bat/ads/internal/conversions/conversions_observer.h"
 #include "bat/ads/internal/database/database_manager_observer.h"
 #include "bat/ads/internal/transfer/transfer_observer.h"
 #include "bat/ads/public/interfaces/ads.mojom-forward.h"
 #include "bat/ads/public/interfaces/ads.mojom-shared.h"
+#include "brave/components/services/bat_ads/public/interfaces/bat_ads.mojom.h"
 
 class GURL;
 
@@ -57,6 +57,7 @@ class TextEmbedding;
 
 class Account;
 class AdsClientHelper;
+class AdsObserverManager;
 class BrowserManager;
 class Catalog;
 class ClientStateManager;
@@ -86,7 +87,6 @@ struct ConversionQueueItemInfo;
 struct NotificationAdInfo;
 
 class AdsImpl final : public Ads,
-                      public AccountObserver,
                       public ConversionsObserver,
                       public DatabaseManagerObserver,
                       public TransferObserver {
@@ -102,6 +102,9 @@ class AdsImpl final : public Ads,
   ~AdsImpl() override;
 
   // Ads:
+  void AddBatAdsObserver(
+      mojo::PendingRemote<bat_ads::mojom::BatAdsObserver> observer) override;
+
   void Initialize(InitializeCallback callback) override;
   void Shutdown(ShutdownCallback callback) override;
 
@@ -209,9 +212,6 @@ class AdsImpl final : public Ads,
 
   void Start();
 
-  // AccountObserver:
-  void OnStatementOfAccountsDidChange() override;
-
   // ConversionsObserver:
   void OnConversion(
       const ConversionQueueItemInfo& conversion_queue_item) override;
@@ -226,6 +226,7 @@ class AdsImpl final : public Ads,
 
   std::unique_ptr<AdsClientHelper> ads_client_helper_;
 
+  std::unique_ptr<AdsObserverManager> ads_observer_manager_;
   std::unique_ptr<BrowserManager> browser_manager_;
   std::unique_ptr<ClientStateManager> client_state_manager_;
   std::unique_ptr<FlagManager> flag_manager_;

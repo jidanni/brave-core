@@ -17,6 +17,7 @@
 #include "base/scoped_observation.h"
 #include "base/strings/string_number_conversions.h"
 #include "base/time/time.h"
+#include "bat/ads/ads_observer.h"
 #include "bat/ads/supported_subdivisions.h"
 #include "bat/ledger/mojom_structs.h"
 #include "brave/browser/brave_ads/ads_service_factory.h"
@@ -77,6 +78,7 @@ brave_rewards::RewardsPanelCoordinator* GetPanelCoordinator(
 class RewardsDOMHandler
     : public WebUIMessageHandler,
       public brave_ads::AdsServiceObserver,
+      public ads::AdsObserver,
       public brave_rewards::RewardsNotificationServiceObserver,
       public brave_rewards::RewardsServiceObserver {
  public:
@@ -269,8 +271,11 @@ class RewardsDOMHandler
           notifications_list) override;
 
   // AdsServiceObserver implementation
-  void OnAdRewardsDidChange() override;
+  void OnDidInitializeAds() override;
   void OnNeedsBrowserUpgradeToServeAds() override;
+
+  // ads::AdsObserver:
+  void OnStatementOfAccountsDidChange() override;
 
   void InitPrefChangeRegistrar();
   void OnPrefChanged(const std::string& key);
@@ -601,12 +606,19 @@ void RewardsDOMHandler::OnJavascriptAllowed() {
   if (ads_service_) {
     ads_service_observation_.Reset();
     ads_service_observation_.Observe(ads_service_);
+
+    ads_service_->RemoveBatAdsObserver(this);
+    ads_service_->AddBatAdsObserver(this);
   }
 }
 
 void RewardsDOMHandler::OnJavascriptDisallowed() {
   rewards_service_observation_.Reset();
   ads_service_observation_.Reset();
+
+  if (ads_service_) {
+    ads_service_->RemoveBatAdsObserver(this);
+  }
 
   weak_factory_.InvalidateWeakPtrs();
 }
@@ -1506,17 +1518,22 @@ void RewardsDOMHandler::OnStatementChanged(
   }
 }
 
-void RewardsDOMHandler::OnAdRewardsDidChange() {
-  if (!ads_service_) {
-    return;
+void RewardsDOMHandler::OnDidInitializeAds() {
+  if (ads_service_) {
+    ads_service_->RemoveBatAdsObserver(this);
+    ads_service_->AddBatAdsObserver(this);
   }
-
-  ads_service_->GetStatementOfAccounts(base::BindOnce(
-      &RewardsDOMHandler::OnGetStatement, weak_factory_.GetWeakPtr()));
 }
 
 void RewardsDOMHandler::OnNeedsBrowserUpgradeToServeAds() {
   GetAdsData(base::Value::List());
+}
+
+void RewardsDOMHandler::OnStatementOfAccountsDidChange() {
+  if (ads_service_) {
+    ads_service_->GetStatementOfAccounts(base::BindOnce(
+        &RewardsDOMHandler::OnGetStatement, weak_factory_.GetWeakPtr()));
+  }
 }
 
 void RewardsDOMHandler::OnRecurringTipSaved(

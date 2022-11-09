@@ -19,6 +19,7 @@
 #include "bat/ads/history_item_info.h"
 #include "bat/ads/history_sort_types.h"
 #include "bat/ads/public/interfaces/ads.mojom-forward.h"
+#include "brave/components/services/bat_ads/public/interfaces/bat_ads.mojom.h"
 
 class GURL;
 
@@ -48,6 +49,10 @@ class ADS_EXPORT Ads {
   virtual ~Ads() = default;
 
   static Ads* CreateInstance(AdsClient* ads_client);
+
+  // Binds a listener to be notified of something exciting.
+  virtual void AddBatAdsObserver(
+      mojo::PendingRemote<bat_ads::mojom::BatAdsObserver> observer) = 0;
 
   // Called to initialize ads. The callback takes one argument - |bool| is set
   // to |true| if successful otherwise |false|.
