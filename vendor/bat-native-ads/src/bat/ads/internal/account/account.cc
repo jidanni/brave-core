@@ -28,7 +28,6 @@
 #include "bat/ads/internal/ads_client_helper.h"
 #include "bat/ads/internal/ads_observer_manager.h"
 #include "bat/ads/internal/base/logging_util.h"
-#include "bat/ads/internal/prefs/pref_manager.h"
 #include "bat/ads/internal/privacy/tokens/token_generator_interface.h"
 #include "bat/ads/public/interfaces/ads.mojom.h"  // IWYU pragma: keep
 #include "brave/components/brave_ads/common/pref_names.h"
@@ -43,7 +42,7 @@ Account::Account(privacy::TokenGeneratorInterface* token_generator)
       refill_unblinded_tokens_(
           std::make_unique<RefillUnblindedTokens>(token_generator)),
       wallet_(std::make_unique<Wallet>()) {
-  PrefManager::GetInstance()->AddObserver(this);
+  AdsClientHelper::AddObserver(this);
 
   confirmations_->SetDelegate(this);
   issuers_->SetDelegate(this);
@@ -52,7 +51,7 @@ Account::Account(privacy::TokenGeneratorInterface* token_generator)
 }
 
 Account::~Account() {
-  PrefManager::GetInstance()->RemoveObserver(this);
+  AdsClientHelper::RemoveObserver(this);
 }
 
 void Account::AddObserver(AccountObserver* observer) {
@@ -65,10 +64,11 @@ void Account::RemoveObserver(AccountObserver* observer) {
   observers_.RemoveObserver(observer);
 }
 
-void Account::SetWallet(const std::string& id, const std::string& seed) {
+void Account::SetWallet(const std::string& payment_id,
+                        const std::string& recovery_seed) {
   const WalletInfo last_wallet_copy = GetWallet();
 
-  if (!wallet_->Set(id, seed)) {
+  if (!wallet_->Set(payment_id, recovery_seed)) {
     BLOG(0, "Failed to set wallet");
     NotifyInvalidWallet();
     return;
@@ -273,6 +273,11 @@ void Account::OnPrefDidChange(const std::string& path) {
   if (path == prefs::kEnabled) {
     MaybeGetIssuers();
   }
+}
+
+void Account::OnRewardsWalletDidChange(const std::string& payment_id,
+                                       const std::string& recovery_seed) {
+  SetWallet(payment_id, recovery_seed);
 }
 
 void Account::OnDidConfirm(const ConfirmationInfo& confirmation) {
