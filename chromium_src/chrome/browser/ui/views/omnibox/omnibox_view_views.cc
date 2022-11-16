@@ -58,6 +58,23 @@ int GetSearchEnginesID() {
 
 }  // namespace
 
+bool OmniboxViewViews::SelectedTextIsURL() {
+  GURL url;
+  bool write_url = false;
+  std::u16string selected_text = GetSelectedText();
+  model()->AdjustTextForCopy(GetSelectedRange().GetMin(), &selected_text, &url,
+                             &write_url);
+  return write_url;
+}
+
+bool OmniboxViewViews::IsCleanLinkCommand(int command_id) const {
+  return command_id == IDC_COPY_CLEAN_LINK;
+}
+
+void OmniboxViewViews::OnSanitizedCopy(ui::ClipboardBuffer clipboard_buffer) {
+  ExecuteCommand(IDC_COPY_CLEAN_LINK, 0);
+}
+
 #define ShowBubble                                                     \
   ShowBubble();                                                        \
   return;                                                              \
