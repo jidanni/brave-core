@@ -4,7 +4,7 @@
 // you can obtain one at http://mozilla.org/MPL/2.0/.
 
 import {PolymerElement} from 'chrome://resources/polymer/v3_0/polymer/polymer_bundled.min.js'
-import {I18nMixin, I18nMixinInterface} from 'chrome://resources/js/i18n_mixin.js'
+import {I18nMixin, I18nMixinInterface} from 'chrome://resources/cr_elements/i18n_mixin.js'
 import {PrefsMixin, PrefsMixinInterface} from '../prefs/prefs_mixin.js'
 import '../settings_shared.css.js'
 import '../settings_vars.css.js'
@@ -19,6 +19,9 @@ enum BookmarkBarState {
   NONE = 1,
   NTP = 2,
 }
+
+const kAlwaysShowBookmarBarPrefName = 'brave.always_show_bookmark_bar_on_ntp'
+const kShowOnAllTabsPrefName = 'bookmark_bar.show_on_all_tabs'
 
 /**
  * 'settings-brave-appearance-bookmark-bar' is the settings page area containing
@@ -69,29 +72,29 @@ export class SettingsBraveAppearanceBookmarkBarElement extends SettingsBraveAppe
     super.ready()
     window.addEventListener('load', this.onLoad_.bind(this));
   }
-  /** @private **/
-  onLoad_() {
+
+  private onLoad_() {
     this.setControlValueFromPrefs()
   }
 
   private getBookmarkBarStateFromPrefs(): BookmarkBarState {
-    if (this.getPref('bookmark_bar.show_on_all_tabs').value)
+    if (this.getPref(kShowOnAllTabsPrefName).value)
       return BookmarkBarState.ALWAYS
 
-    if (this.getPref('brave.always_show_bookmark_bar_on_ntp').value)
+    if (this.getPref(kAlwaysShowBookmarBarPrefName).value)
       return BookmarkBarState.NTP
     return BookmarkBarState.NONE
   }
 
   private saveBookmarkBarStateToPrefs(state: BookmarkBarState) {
     if (state === BookmarkBarState.ALWAYS) {
-      this.setPrefValue('bookmark_bar.show_on_all_tabs', true)
+      this.setPrefValue(kShowOnAllTabsPrefName, true)
     } else if (state === BookmarkBarState.NTP) {
-      this.setPrefValue('bookmark_bar.show_on_all_tabs', false)
-      this.setPrefValue('brave.always_show_bookmark_bar_on_ntp', true)
+      this.setPrefValue(kShowOnAllTabsPrefName, false)
+      this.setPrefValue(kAlwaysShowBookmarBarPrefName, true)
     } else {
-      this.setPrefValue('bookmark_bar.show_on_all_tabs', false)
-      this.setPrefValue('brave.always_show_bookmark_bar_on_ntp', false)
+      this.setPrefValue(kShowOnAllTabsPrefName, false)
+      this.setPrefValue(kAlwaysShowBookmarBarPrefName, false)
     }
   }
   private setControlValueFromPrefs() {

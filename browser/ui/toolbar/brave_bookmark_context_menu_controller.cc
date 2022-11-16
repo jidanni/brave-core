@@ -41,6 +41,7 @@ void BraveBookmarkContextMenuController::AddBraveBookmarksSubmenu(
   menu_model()->RemoveItemAt(index.value());
   brave_bookmarks_submenu_model_ =
       std::make_unique<BookmarkBarSubMenuModel>(profile);
+
   menu_model()->AddSubMenuWithStringId(IDC_BRAVE_BOOKMARK_BAR_SUBMENU,
                                        IDS_SHOW_BOOKMARK_BAR,
                                        brave_bookmarks_submenu_model_.get());

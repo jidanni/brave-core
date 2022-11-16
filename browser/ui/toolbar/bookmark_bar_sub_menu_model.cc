@@ -80,6 +80,7 @@ void BookmarkBarSubMenuModel::SaveBookmarkBarStateToPrefs(
   auto* prefs = profile_->GetPrefs();
   if (state == BookmarkBarState::ALWAYS) {
     prefs->SetBoolean(bookmarks::prefs::kShowBookmarkBar, true);
+    prefs->SetBoolean(kAlwaysShowBookmarkBarOnNTP, true);
   } else if (state == BookmarkBarState::NTP) {
     prefs->SetBoolean(bookmarks::prefs::kShowBookmarkBar, false);
     prefs->SetBoolean(kAlwaysShowBookmarkBarOnNTP, true);

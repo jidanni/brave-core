@@ -8,9 +8,10 @@
 
 #if !BUILDFLAG(IS_ANDROID)
 #include "brave/browser/ui/bookmark/bookmark_prefs_service_factory.h"
-#endif
 
-#if !BUILDFLAG(IS_ANDROID)
+// Adding BookmarkPrefsServiceFactory as dependency becasue kShowBookmarBar and
+// kAlwaysShowBookmarkBarOnNTP manage bookmar bar state togher and need to
+// register both prefs same time.
 #define DependsOn                                        \
   DependsOn(BookmarkPrefsServiceFactory::GetInstance()); \
   DependsOn
