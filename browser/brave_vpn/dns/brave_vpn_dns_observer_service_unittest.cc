@@ -54,7 +54,7 @@ class BraveVpnDnsObserverServiceUnitTest : public testing::Test {
 
   void SetUp() override {
     dns_service_.reset(new BraveVpnDnsObserverService(
-        local_state(),
+        local_state(), pref_service(),
         base::BindRepeating(
             &BraveVpnDnsObserverServiceUnitTest::ReadDNSPolicyValue,
             base::Unretained(this))));

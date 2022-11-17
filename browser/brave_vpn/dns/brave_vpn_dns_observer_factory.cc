@@ -11,6 +11,7 @@
 
 #include "brave/browser/brave_vpn/dns/brave_vpn_dns_observer_service.h"
 #include "brave/components/brave_vpn/brave_vpn_utils.h"
+#include "brave/components/brave_vpn/pref_names.h"
 #include "chrome/browser/browser_process.h"
 #include "chrome/browser/policy/chrome_browser_policy_connector.h"
 #include "components/keyed_service/content/browser_context_dependency_manager.h"
@@ -18,6 +19,9 @@
 #include "components/policy/core/common/cloud/machine_level_user_cloud_policy_manager.h"
 #include "components/policy/core/common/cloud/machine_level_user_cloud_policy_store.h"
 #include "components/policy/core/common/policy_map.h"
+#include "components/pref_registry/pref_registry_syncable.h"
+#include "components/user_prefs/user_prefs.h"
+#include "content/public/browser/browser_context.h"
 
 namespace brave_vpn {
 
@@ -51,6 +55,7 @@ BraveVpnDnsObserverFactory::BraveVpnDnsObserverFactory()
 KeyedService* BraveVpnDnsObserverFactory::BuildServiceInstanceFor(
     content::BrowserContext* context) const {
   return new BraveVpnDnsObserverService(g_browser_process->local_state(),
+                                        user_prefs::UserPrefs::Get(context),
                                         base::BindRepeating(&GetPolicyValue));
 }
 
@@ -61,6 +66,12 @@ BraveVpnDnsObserverService* BraveVpnDnsObserverFactory::GetServiceForContext(
     return nullptr;
   return static_cast<BraveVpnDnsObserverService*>(
       GetInstance()->GetServiceForBrowserContext(context, true));
+}
+
+void BraveVpnDnsObserverFactory::RegisterProfilePrefs(
+    user_prefs::PrefRegistrySyncable* registry) {
+  registry->RegisterBooleanPref(prefs::kBraveVPNShowDNSPolicyWarningDialog,
+                                true);
 }
 
 }  // namespace brave_vpn

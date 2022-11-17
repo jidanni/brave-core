@@ -13,6 +13,10 @@ namespace content {
 class BrowserContext;
 }  // namespace content
 
+namespace user_prefs {
+class PrefRegistrySyncable;
+}  // namespace user_prefs
+
 namespace brave_vpn {
 
 class BraveVpnDnsObserverService;
@@ -26,6 +30,8 @@ class BraveVpnDnsObserverFactory : public BrowserContextKeyedServiceFactory {
   static BraveVpnDnsObserverFactory* GetInstance();
   static BraveVpnDnsObserverService* GetServiceForContext(
       content::BrowserContext* context);
+  void RegisterProfilePrefs(
+      user_prefs::PrefRegistrySyncable* registry) override;
 
  private:
   friend struct base::DefaultSingletonTraits<BraveVpnDnsObserverFactory>;

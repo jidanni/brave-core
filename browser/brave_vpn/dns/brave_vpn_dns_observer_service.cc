@@ -33,11 +33,13 @@ namespace brave_vpn {
 
 namespace {
 const char kBraveVpnDnsProvider[] = "Cloudflare";
+
 void SkipDNSDialog(PrefService* prefs, bool checked) {
   if (!prefs)
     return;
   prefs->SetBoolean(prefs::kBraveVPNShowDNSPolicyWarningDialog, !checked);
 }
+
 std::string GetFilteredProvidersForCountry() {
   namespace secure_dns = chrome_browser_net::secure_dns;
   // Use default hardcoded servers for current country.
@@ -54,22 +56,30 @@ std::string GetFilteredProvidersForCountry() {
                << " is available in the default list.";
   return std::string("1.1.1.1");
 }
+
 std::string GetDoHServers(SecureDnsConfig* dns_config) {
   return dns_config && !dns_config->doh_servers().servers().empty()
              ? dns_config->doh_servers().ToString()
              : GetFilteredProvidersForCountry();
 }
+
 gfx::NativeWindow GetAnchorBrowserWindow() {
   auto* browser = chrome::FindLastActive();
   return browser ? browser->window()->GetNativeWindow()
                  : gfx::kNullNativeWindow;
 }
+
 }  // namespace
 
 BraveVpnDnsObserverService::BraveVpnDnsObserverService(
     PrefService* local_state,
+    PrefService* profile_prefs,
     DnsPolicyReaderCallback callback)
-    : policy_reader_(std::move(callback)), local_state_(local_state) {
+    : policy_reader_(std::move(callback)),
+      local_state_(local_state),
+      profile_prefs_(profile_prefs) {
+  DCHECK(profile_prefs_);
+  DCHECK(local_state_);
   pref_change_registrar_.Init(local_state);
   pref_change_registrar_.Add(
       ::prefs::kDnsOverHttpsMode,
@@ -95,18 +105,8 @@ bool BraveVpnDnsObserverService::IsDnsModeConfiguredByPolicy() const {
          !policy_reader_.Run(policy::key::kDnsOverHttpsMode).empty();
 }
 
-PrefService* BraveVpnDnsObserverService::GetPrefService() {
-  if (pref_service_for_testing_)
-    return pref_service_for_testing_;
-  auto* browser = chrome::FindLastActive();
-  if (!browser)
-    return nullptr;
-  return browser->profile()->GetPrefs();
-}
-
 void BraveVpnDnsObserverService::ShowPolicyWarningMessage() {
-  auto* prefs = GetPrefService();
-  if (prefs && !prefs->GetBoolean(prefs::kBraveVPNShowDNSPolicyWarningDialog)) {
+  if (!profile_prefs_->GetBoolean(prefs::kBraveVPNShowDNSPolicyWarningDialog)) {
     return;
   }
 
@@ -119,7 +119,7 @@ void BraveVpnDnsObserverService::ShowPolicyWarningMessage() {
       GetAnchorBrowserWindow(), l10n_util::GetStringUTF16(IDS_PRODUCT_NAME),
       l10n_util::GetStringUTF16(IDS_BRAVE_VPN_DNS_POLICY_ALERT),
       l10n_util::GetStringUTF16(IDS_BRAVE_VPN_DNS_POLICY_CHECKBOX),
-      base::BindOnce(&SkipDNSDialog, prefs));
+      base::BindOnce(&SkipDNSDialog, profile_prefs_));
 }
 
 void BraveVpnDnsObserverService::OnDNSPrefChanged() {

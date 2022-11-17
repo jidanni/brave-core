@@ -32,8 +32,6 @@ void RegisterVPNLocalStatePrefs(PrefRegistrySimple* registry) {
   registry->RegisterListPref(prefs::kBraveVPNRegionList);
   registry->RegisterStringPref(prefs::kBraveVPNDeviceRegion, "");
   registry->RegisterStringPref(prefs::kBraveVPNSelectedRegion, "");
-  registry->RegisterBooleanPref(prefs::kBraveVPNShowDNSPolicyWarningDialog,
-                                true);
 #endif
   registry->RegisterStringPref(prefs::kBraveVPNEnvironment,
                                skus::GetDefaultEnvironment());
