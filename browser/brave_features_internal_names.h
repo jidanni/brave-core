@@ -7,6 +7,7 @@
 #define BRAVE_BROWSER_BRAVE_FEATURES_INTERNAL_NAMES_H_
 
 constexpr char kBraveVPNFeatureInternalName[] = "brave-vpn";
+constexpr char kBraveVPNDnsFeatureInternalName[] = "brave-vpn-dns";
 constexpr char kPlaylistFeatureInternalName[] = "playlist";
 
 #endif  // BRAVE_BROWSER_BRAVE_FEATURES_INTERNAL_NAMES_H_

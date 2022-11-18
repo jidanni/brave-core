@@ -230,6 +230,11 @@ constexpr char kBraveSyncDescription[] =
 constexpr char kBraveVPNName[] = "Enable experimental Brave VPN";
 constexpr char kBraveVPNDescription[] = "Experimental native VPN support";
 
+constexpr char kBraveVPNDnsProtectionName[] = "Enable DoH for Brave VPN";
+constexpr char kBraveVPNDnsProtectionDescription[] =
+    "Automatically enable, if possible, DoH with Brave VPN on windows to avoid "
+    "DNS leak due to Smart Multi-Homed Name Resolution";
+
 constexpr char kBraveSkusSdkName[] = "Enable experimental SKU SDK";
 constexpr char kBraveSkusSdkDescription[] = "Experimental SKU SDK support";
 
@@ -421,7 +426,13 @@ constexpr char kBraveAndroidSafeBrowsingDescription[] =
      flag_descriptions::kBraveVPNName,                    \
      flag_descriptions::kBraveVPNDescription,             \
      kOsMac | kOsWin,                                     \
-     FEATURE_VALUE_TYPE(brave_vpn::features::kBraveVPN)},
+     FEATURE_VALUE_TYPE(brave_vpn::features::kBraveVPN)}, \
+    {kBraveVPNDnsFeatureInternalName,                        \
+     flag_descriptions::kBraveVPNDnsProtectionName,                    \
+     flag_descriptions::kBraveVPNDnsProtectionDescription,             \
+     kOsWin,                                     \
+     FEATURE_VALUE_TYPE(brave_vpn::features::kBraveVPNDnsProtection)},
+
 #else
 #define BRAVE_VPN_FEATURE_ENTRIES
 #endif

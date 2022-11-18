@@ -11,6 +11,7 @@
 #include "brave/components/brave_vpn/brave_vpn_os_connection_api.h"
 #include "brave/components/brave_vpn/brave_vpn_service.h"
 #include "brave/components/brave_vpn/brave_vpn_utils.h"
+#include "brave/components/brave_vpn/features.h"
 #include "brave/components/skus/common/features.h"
 #include "build/build_config.h"
 #include "chrome/browser/browser_process.h"
@@ -57,7 +58,10 @@ BraveVpnServiceFactory::BraveVpnServiceFactory()
   DependsOn(skus::SkusServiceFactory::GetInstance());
 
 #if BUILDFLAG(IS_WIN)
-  DependsOn(brave_vpn::BraveVpnDnsObserverFactory::GetInstance());
+  if (base::FeatureList::IsEnabled(
+          brave_vpn::features::kBraveVPNDnsProtection)) {
+    DependsOn(brave_vpn::BraveVpnDnsObserverFactory::GetInstance());
+  }
 #endif
 
 #if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
@@ -91,11 +95,14 @@ KeyedService* BraveVpnServiceFactory::BuildServiceInstanceFor(
       new BraveVpnService(shared_url_loader_factory, local_state,
                           user_prefs::UserPrefs::Get(context), callback);
 #if BUILDFLAG(IS_WIN)
-  auto* dns_observer_service =
-      brave_vpn::BraveVpnDnsObserverFactory::GetInstance()
-          ->GetServiceForContext(context);
-  if (dns_observer_service)
-    dns_observer_service->Observe(vpn_service);
+  if (base::FeatureList::IsEnabled(
+          brave_vpn::features::kBraveVPNDnsProtection)) {
+    auto* dns_observer_service =
+        brave_vpn::BraveVpnDnsObserverFactory::GetInstance()
+            ->GetServiceForContext(context);
+    if (dns_observer_service)
+      dns_observer_service->Observe(vpn_service);
+  }
 #endif
   return vpn_service;
 }
