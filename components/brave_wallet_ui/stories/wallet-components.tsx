@@ -15,6 +15,8 @@ import { SweepstakesBanner } from '../components/desktop/sweepstakes-banner'
 import { LoadingSkeleton } from '../components/shared'
 import { ChartControlBar } from '../components/desktop/chart-control-bar/chart-control-bar'
 import { BuySendSwapDepositNav } from '../components/desktop/buy-send-swap-deposit-nav/buy-send-swap-deposit-nav'
+import { NftIpfsBanner } from '../components/desktop/nft-ipfs-banner/nft-ipfs-banner'
+import { RunLocalIpfsNode } from '../components/desktop/run-local-ipfs-node/run-local-ipfs-node'
 
 export default {
   title: 'Wallet/Desktop/Components',
@@ -125,4 +127,38 @@ export const _BuySendSwapDeposit = () => {
 
 _BuySendSwapDeposit.story = {
   name: 'Buy/Send/Swap/Deposit'
+}
+
+export const _NftIpfsBanner = () => {
+  const [showBanner, setShowBanner] = React.useState(true)
+
+  const onDismiss = React.useCallback(() => {
+    setShowBanner(false)
+  }, [])
+
+  return (
+    <div style={{ width: '855px' }}>
+      {showBanner && <NftIpfsBanner onDismiss={onDismiss} />}
+    </div>
+  )
+}
+
+_NftIpfsBanner.story = {
+  name: 'NFT IPFS Banner'
+}
+
+export const _RunLocalIpfs = () => {
+  const onClose = () => {
+    console.log('close')
+  }
+
+  return (
+    <RunLocalIpfsNode
+    onClose={onClose}
+    />
+  )
+}
+
+_RunLocalIpfs.story = {
+  name: 'Run Local IPFS Node'
 }
