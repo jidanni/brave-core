@@ -14,6 +14,8 @@
 #include "brave/components/brave_vpn/brave_vpn_service_observer.h"
 #include "components/keyed_service/core/keyed_service.h"
 #include "components/prefs/pref_change_registrar.h"
+#include "net/dns/dns_config.h"
+#include "net/dns/dns_config_service.h"
 #include "third_party/abseil-cpp/absl/types/optional.h"
 
 class SecureDnsConfig;
@@ -50,8 +52,13 @@ class BraveVpnDnsObserverService : public brave_vpn::BraveVPNServiceObserver,
     allow_changes_for_testing_ = allow;
   }
 
+  bool IsDNSConfigBlocked();
+
   void SetPolicyNotificationCallbackForTesting(base::OnceClosure callback) {
     policy_callback_ = std::move(callback);
+  }
+  void SkipNotificationDialogForTesting(bool value) {
+    skip_notification_dialog_for_testing_ = value;
   }
   void SetPrefServiceForTesting(PrefService* service) {
     pref_service_for_testing_ = service;
@@ -59,20 +66,28 @@ class BraveVpnDnsObserverService : public brave_vpn::BraveVPNServiceObserver,
   bool IsDnsModeConfiguredByPolicy() const;
 
  private:
+  friend class BraveVpnDnsObserverServiceUnitTest;
+
+  bool IsDNSSecure(SecureDnsConfig dns_config) const;
+  void OnSystemDNSConfigChanged(const net::DnsConfig& config);
   void OnDNSPrefChanged();
   void OnDNSDialogDismissed(bool checked);
   void SetDNSOverHTTPSMode(const std::string& mode,
                            const std::string& doh_providers);
   void ShowPolicyWarningMessage();
+  void ShowMessageWhyWeOverrideDNSSettings();
 
   base::OnceClosure policy_callback_;
   DnsPolicyReaderCallback policy_reader_;
   bool ignore_prefs_change_ = true;
   absl::optional<bool> allow_changes_for_testing_;
+  bool skip_notification_dialog_for_testing_ = false;
   raw_ptr<PrefService> local_state_;
   raw_ptr<PrefService> profile_prefs_;
   raw_ptr<PrefService> pref_service_for_testing_;
   PrefChangeRegistrar pref_change_registrar_;
+  std::unique_ptr<net::DnsConfigService> dns_config_service_;
+  net::DnsConfig system_dns_config_;
   std::unique_ptr<SecureDnsConfig> user_dns_config_;
   base::WeakPtrFactory<BraveVpnDnsObserverService> weak_ptr_factory_{this};
 };

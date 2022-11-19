@@ -100,6 +100,7 @@ std::string GetManageUrl(const std::string& env) {
 void RegisterProfilePrefs(user_prefs::PrefRegistrySyncable* registry) {
   registry->RegisterDictionaryPref(prefs::kBraveVPNRootPref);
   registry->RegisterBooleanPref(prefs::kBraveVPNShowButton, true);
+  registry->RegisterDictionaryPref(prefs::kBraveVPNUserConfig);
 #if BUILDFLAG(IS_ANDROID)
   registry->RegisterStringPref(prefs::kBraveVPNPurchaseTokenAndroid, "");
   registry->RegisterStringPref(prefs::kBraveVPNPackageAndroid, "");
