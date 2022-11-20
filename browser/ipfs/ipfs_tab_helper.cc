@@ -120,7 +120,7 @@ void IPFSTabHelper::HostResolvedCallback(
     absl::optional<std::string> x_ipfs_path_header,
     const std::string& host,
     const absl::optional<std::string>& dnslink) {
-  if (current.host() != web_contents()->GetURL().host() ||
+  if (current.host() != web_contents()->GetVisibleURL().host() ||
       !current.SchemeIsHTTPOrHTTPS())
     return;
   if (!dnslink || dnslink.value().empty()) {
@@ -155,7 +155,7 @@ void IPFSTabHelper::UpdateLocationBar() {
 GURL IPFSTabHelper::GetCurrentPageURL() const {
   if (current_page_url_for_testing_.is_valid())
     return current_page_url_for_testing_;
-  return web_contents()->GetVisibleURL();
+  return web_contents()->GetLastCommittedURL();
 }
 
 GURL IPFSTabHelper::GetIPFSResolvedURL() const {
@@ -175,11 +175,11 @@ void IPFSTabHelper::CheckDNSLinkRecord(
   if (!target.SchemeIsHTTPOrHTTPS())
     return;
 
-  const auto& host_port_pair = net::HostPortPair::FromURL(target);
+  auto host_port_pair = net::HostPortPair::FromURL(target);
 
   auto resolved_callback =
       base::BindOnce(&IPFSTabHelper::HostResolvedCallback,
-                     weak_ptr_factory_.GetWeakPtr(), web_contents()->GetURL(),
+                     weak_ptr_factory_.GetWeakPtr(), GetCurrentPageURL(),
                      target, is_gateway_url, std::move(x_ipfs_path_header));
 
   const auto& network_anonymization_key =

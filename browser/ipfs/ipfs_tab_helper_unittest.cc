@@ -532,6 +532,26 @@ TEST_F(IpfsTabHelperUnitTest, GatewayIPNS_Redirect) {
   ASSERT_EQ(GURL("ipns://brantly.eth/page?query#ref"), redirect_url());
 }
 
+TEST_F(IpfsTabHelperUnitTest, GatewayIPNS_No_Redirect_WhenNoDnsLink) {
+  SetAutoRedirecIPFSResources(true);
+  SetAutoRedirectDNSLink(false);
+
+  auto* helper = ipfs_tab_helper();
+  ASSERT_TRUE(helper);
+
+  web_contents()->NavigateAndCommit(
+      GURL("https://ipfs.io/ipns/brantly-eth/page?query#ref"));
+  helper->SetPageURLForTesting(
+      GURL("https://ipfs.io/ipns/brantly-eth/page?query#ref"));
+
+  ipfs_host_resolver()->SetDNSLinkToRespond("");
+  auto headers = net::HttpResponseHeaders::TryToCreate("HTTP/1.1 200 OK");
+  helper->MaybeCheckDNSLinkRecord(headers.get());
+
+  EXPECT_TRUE(ipfs_host_resolver()->resolve_called());
+  ASSERT_EQ(GURL(), redirect_url());
+}
+
 TEST_F(IpfsTabHelperUnitTest, GatewayIPNS_Redirect_LibP2PKey) {
   SetAutoRedirecIPFSResources(true);
   SetAutoRedirectDNSLink(false);

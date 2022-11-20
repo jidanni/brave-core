@@ -101,7 +101,8 @@ class IPFSTabHelper : public content::WebContentsObserver,
                            GatewayIPNS_Redirect_LibP2PKey);
   FRIEND_TEST_ALL_PREFIXES(IpfsTabHelperUnitTest,
                            GatewayIPNS_Redirect_LibP2PKey_NoAutoRedirect);
-
+  FRIEND_TEST_ALL_PREFIXES(IpfsTabHelperUnitTest,
+                           GatewayIPNS_No_Redirect_WhenNoDnsLink);
   friend class content::WebContentsUserData<IPFSTabHelper>;
   explicit IPFSTabHelper(content::WebContents* web_contents);
 
