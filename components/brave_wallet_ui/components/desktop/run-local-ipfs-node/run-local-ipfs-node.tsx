@@ -11,7 +11,7 @@ import {
   CloseIcon,
   HeadingWrapper,
   Heading,
-  StyledWrapper,
+  RunNodeWrapper,
   TopRow,
   MainContent,
   IpfsIcon,
@@ -34,7 +34,7 @@ export const RunLocalIpfsNode = (props: Props) => {
   const { onClose } = props
 
   return (
-    <StyledWrapper>
+    <RunNodeWrapper>
       <TopRow>
         <CloseButton onClick={onClose}>
           Close
@@ -80,6 +80,6 @@ export const RunLocalIpfsNode = (props: Props) => {
           </RightWrapper>
         </Section>
       </MainContent>
-    </StyledWrapper>
+    </RunNodeWrapper>
   )
 }

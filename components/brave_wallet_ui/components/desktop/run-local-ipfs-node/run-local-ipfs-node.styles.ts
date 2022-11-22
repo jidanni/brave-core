@@ -10,14 +10,24 @@ import Background from '../../../assets/svg-icons/nft-ipfs/local-node-background
 import Ipfs from '../../../assets/svg-icons/nft-ipfs/ipfs.svg'
 import Close from '../../../assets/svg-icons/close.svg'
 
-export const StyledWrapper = styled.div`
+export const RunNodeWrapper = styled.div`
   display: flex;
   flex-direction: column;
+  position: relative;
   width: 100vw;
-  height: calc(100vh - 88px);
-  background: url(${Background}) bottom 0 center/contain no-repeat, linear-gradient(110.74deg, #242464 -10.97%, #000027 173.98%);
+  height: calc(100vh - 56px);
+  background-image: url(${Background});
+  background-size: cover;
+  background-repeat: no-repeat;
   padding-top: 68px;
-  `
+  background-position: 0px -20px;
+  margin-top: -32px;
+
+
+  @media (min-width: 1024px) {
+    overflow: hidden;
+  }
+`
 
 export const TopRow = styled.div`
   display: flex;
@@ -27,11 +37,8 @@ export const TopRow = styled.div`
   height: 10px;
   padding-right: 122px;
 
-  @media (max-width: 768px) {
-    padding-right: 20px;
-  }
-
-`
+  
+  `
 
 export const MainContent = styled.div`
   display: flex;
@@ -41,6 +48,14 @@ export const MainContent = styled.div`
   width: 100%;
   margin: 0 20px;
   max-width: 1117px;
+  
+  @media (max-width: 768px) {
+    padding: 0 20px;
+  }
+  
+  @media (max-width: 1024px) {
+    padding: 0 20px;
+  }
 `
 
 export const CloseButton = styled(WalletButton)`
@@ -81,6 +96,10 @@ export const HeadingWrapper = styled.div`
   margin-top: 36px;
 
   @media (max-width: 768px) {
+    margin: 0 50px 16px;
+  }
+
+  @media (max-width: 1024px) {
     margin: 0 50px 16px;
   }
 
