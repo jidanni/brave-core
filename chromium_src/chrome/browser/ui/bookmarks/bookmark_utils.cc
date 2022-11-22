@@ -16,6 +16,25 @@
 #include "ui/color/color_provider.h"
 #include "ui/gfx/color_utils.h"
 
+namespace chrome {
+
+void ToggleBookmarkBarWhenVisible_ChromiumImpl(
+    content::BrowserContext* browser_context);
+
+void BraveToggleBookmarkBarState(content::BrowserContext* browser_context) {
+  auto* prefs = user_prefs::UserPrefs::Get(browser_context);
+  // On macOS with the View menu or via hotkeys, the options Always show
+  // bookmarks is a checkbox. We will keep that checkbox to be Always and Never.
+  const bool always_show =
+      prefs->GetBoolean(bookmarks::prefs::kShowBookmarkBar);
+  if (always_show) {
+    prefs->SetBoolean(kAlwaysShowBookmarkBarOnNTP, false);
+  }
+  ToggleBookmarkBarWhenVisible_ChromiumImpl(browser_context);
+}
+
+}  // namespace chrome
+
 #define IsAppsShortcutEnabled IsAppsShortcutEnabled_Unused
 #define ShouldShowAppsShortcutInBookmarkBar \
   ShouldShowAppsShortcutInBookmarkBar_Unused
@@ -24,19 +43,10 @@
 #define GetBookmarkFolderIcon GetBookmarkFolderIcon_UnUsed
 #endif
 
-#define ToggleBookmarkBarWhenVisible                                  \
-  ToggleBookmarkBarWhenVisible_ChromiumImpl(                          \
-      content::BrowserContext* browser_context);                      \
-  void ToggleBookmarkBarWhenVisible(                                  \
-      content::BrowserContext* browser_context) {                     \
-    PrefService* prefs = user_prefs::UserPrefs::Get(browser_context); \
-    const bool always_show =                                          \
-        prefs->GetBoolean(bookmarks::prefs::kShowBookmarkBar);        \
-    if (always_show) {                                                \
-      prefs->SetBoolean(kAlwaysShowBookmarkBarOnNTP, false);          \
-    }                                                                 \
-    ToggleBookmarkBarWhenVisible_ChromiumImpl(browser_context);       \
-  }                                                                   \
+#define ToggleBookmarkBarWhenVisible                                       \
+  ToggleBookmarkBarWhenVisible(content::BrowserContext* browser_context) { \
+    BraveToggleBookmarkBarState(browser_context);                          \
+  }                                                                        \
   void ToggleBookmarkBarWhenVisible_ChromiumImpl
 
 #include "src/chrome/browser/ui/bookmarks/bookmark_utils.cc"

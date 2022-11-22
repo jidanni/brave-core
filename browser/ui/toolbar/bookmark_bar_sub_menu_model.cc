@@ -66,12 +66,14 @@ bool BookmarkBarSubMenuModel::IsCommandIdEnabled(int command_id) const {
 
 BookmarkBarSubMenuModel::BookmarkBarState
 BookmarkBarSubMenuModel::GetBookmarkBarStateFromPrefs() const {
+  // kShowBookmarkBar has higher priority and the bookmark bar is shown always.
   if (profile_->GetPrefs()->GetBoolean(bookmarks::prefs::kShowBookmarkBar))
     return BookmarkBarState::ALWAYS;
-
+  // kShowBookmarkBar is false, kAlwaysShowBookmarkBarOnNTP is true
+  // -> the bookmark bar is shown only for NTP.
   if (profile_->GetPrefs()->GetBoolean(kAlwaysShowBookmarkBarOnNTP))
     return BookmarkBarState::NTP;
-
+  // NEVER show the bookmark bar.
   return BookmarkBarState::NEVER;
 }
 
