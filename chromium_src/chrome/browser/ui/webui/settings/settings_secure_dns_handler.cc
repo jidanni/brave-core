@@ -26,11 +26,8 @@ bool IsBlockedByBraveVPN() {
   auto* browser = chrome::FindLastActive();
   if (!browser)
     return false;
-  return !browser->profile()
-              ->GetOriginalProfile()
-              ->GetPrefs()
-              ->GetDict(brave_vpn::prefs::kBraveVPNUserConfig)
-              .empty();
+  return browser->profile()->GetOriginalProfile()->GetPrefs()->GetBoolean(
+      brave_vpn::prefs::kBraveVPNUserConfigLocked);
 }
 
 // Dummy function for code injection.

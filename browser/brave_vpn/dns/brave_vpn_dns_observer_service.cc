@@ -194,9 +194,7 @@ void BraveVpnDnsObserverService::OnDNSPrefChanged() {
   if (ignore_prefs_change_)
     return;
   // Reset saved config and keep user's choice.
-  if (ShouldAllowExternalChanges()) {
-    profile_prefs_->ClearPref(prefs::kBraveVPNUserConfig);
-  } else {
+  if (!ShouldAllowExternalChanges()) {
     ignore_prefs_change_ = true;
     const auto& saved_dns_config =
         profile_prefs_->GetDict(prefs::kBraveVPNUserConfig);
@@ -216,17 +214,8 @@ void BraveVpnDnsObserverService::SetDNSOverHTTPSMode(
   local_state_->SetString(::prefs::kDnsOverHttpsMode, mode);
 }
 
-void BraveVpnDnsObserverService::LockDNS() {
-  auto dns_config = SystemNetworkContextManager::GetStubResolverConfigReader()
-                        ->GetSecureDnsConfiguration(false);
-  auto current_doh_servers = dns_config.doh_servers().ToString();
-  SetDNSOverHTTPSMode(SecureDnsConfig::kModeSecure,
-                      GetDoHServers(&current_doh_servers));
-  SaveUserDNSConfig(profile_prefs_, dns_config);
-  ShowMessageWhyWeOverrideDNSSettings();
-}
-
 void BraveVpnDnsObserverService::UnlockDNS() {
+  profile_prefs_->SetBoolean(prefs::kBraveVPNUserConfigLocked, false);
   const auto& saved_dns_config =
       profile_prefs_->GetDict(prefs::kBraveVPNUserConfig);
   if (saved_dns_config.empty())
@@ -239,10 +228,19 @@ void BraveVpnDnsObserverService::UnlockDNS() {
   profile_prefs_->ClearPref(prefs::kBraveVPNUserConfig);
 }
 
+void BraveVpnDnsObserverService::LockDNS(const std::string& servers) {
+  SetDNSOverHTTPSMode(SecureDnsConfig::kModeSecure, GetDoHServers(&servers));
+  profile_prefs_->SetBoolean(prefs::kBraveVPNUserConfigLocked, true);
+  ShowMessageWhyWeOverrideDNSSettings();
+}
+
 void BraveVpnDnsObserverService::OnConnectionStateChanged(
     brave_vpn::mojom::ConnectionState state) {
   if (state == brave_vpn::mojom::ConnectionState::CONNECTED) {
     ignore_prefs_change_ = false;
+    auto dns_config = SystemNetworkContextManager::GetStubResolverConfigReader()
+                          ->GetSecureDnsConfiguration(false);
+    SaveUserDNSConfig(profile_prefs_, dns_config);
     if (!IsDNSSecure(SystemNetworkContextManager::GetStubResolverConfigReader()
                          ->GetSecureDnsConfiguration(false))) {
       // If DNS mode configured by policies we notify user that DNS may leak
@@ -251,7 +249,8 @@ void BraveVpnDnsObserverService::OnConnectionStateChanged(
         ShowPolicyWarningMessage();
         return;
       }
-      LockDNS();
+
+      LockDNS(dns_config.doh_servers().ToString());
     }
   } else if (state == brave_vpn::mojom::ConnectionState::DISCONNECTED) {
     ignore_prefs_change_ = true;

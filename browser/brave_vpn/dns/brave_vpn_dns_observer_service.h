@@ -72,7 +72,7 @@ class BraveVpnDnsObserverService : public brave_vpn::BraveVPNServiceObserver,
   void OnSystemDNSConfigChanged(const net::DnsConfig& config);
   void OnDNSPrefChanged();
   void OnDNSDialogDismissed(bool checked);
-  void LockDNS();
+  void LockDNS(const std::string& servers);
   void UnlockDNS();
   void ShowPolicyWarningMessage();
   void ShowMessageWhyWeOverrideDNSSettings();
