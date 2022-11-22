@@ -52,8 +52,6 @@ class BraveVpnDnsObserverService : public brave_vpn::BraveVPNServiceObserver,
     allow_changes_for_testing_ = allow;
   }
 
-  bool IsDNSConfigBlocked();
-
   void SetPolicyNotificationCallbackForTesting(base::OnceClosure callback) {
     policy_callback_ = std::move(callback);
   }
@@ -68,12 +66,14 @@ class BraveVpnDnsObserverService : public brave_vpn::BraveVPNServiceObserver,
  private:
   friend class BraveVpnDnsObserverServiceUnitTest;
 
+  void SetDNSOverHTTPSMode(const std::string& mode,
+                           const std::string& doh_providers);
   bool IsDNSSecure(SecureDnsConfig dns_config) const;
   void OnSystemDNSConfigChanged(const net::DnsConfig& config);
   void OnDNSPrefChanged();
   void OnDNSDialogDismissed(bool checked);
-  void SetDNSOverHTTPSMode(const std::string& mode,
-                           const std::string& doh_providers);
+  void LockDNS();
+  void UnlockDNS();
   void ShowPolicyWarningMessage();
   void ShowMessageWhyWeOverrideDNSSettings();
 

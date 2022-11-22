@@ -5,6 +5,7 @@
 
 #include "brave/browser/ui/views/brave_vpn/vpn_notification_dialog_view.h"
 
+#include <memory>
 #include <utility>
 
 #include "brave/components/brave_vpn/pref_names.h"
