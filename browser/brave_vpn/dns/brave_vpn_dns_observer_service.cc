@@ -10,6 +10,7 @@
 #include "base/bind.h"
 #include "base/strings/string_split.h"
 #include "base/strings/string_util.h"
+#include "brave/browser/ui/views/brave_vpn/vpn_notification_dialog_view.h"
 #include "brave/components/brave_vpn/pref_names.h"
 #include "chrome/browser/net/secure_dns_config.h"
 #include "chrome/browser/net/secure_dns_util.h"
@@ -182,9 +183,7 @@ void BraveVpnDnsObserverService::ShowPolicyWarningMessage() {
 void BraveVpnDnsObserverService::ShowMessageWhyWeOverrideDNSSettings() {
   if (skip_notification_dialog_for_testing_)
     return;
-  chrome::ShowWarningMessageBox(
-      GetAnchorBrowserWindow(), l10n_util::GetStringUTF16(IDS_PRODUCT_NAME),
-      l10n_util::GetStringUTF16(IDS_BRAVE_VPN_DNS_SETTINGS_OVERRIDEN_ALERT));
+  VpnNotificationDialogView::Show(chrome::FindLastActive());
 }
 
 void BraveVpnDnsObserverService::OnDNSPrefChanged() {

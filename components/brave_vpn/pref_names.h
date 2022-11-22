@@ -20,6 +20,8 @@ constexpr char kBraveVPNSelectedRegion[] =
     "brave.brave_vpn.selected_region_name";
 constexpr char kBraveVPNShowDNSPolicyWarningDialog[] =
     "brave.brave_vpn.show_dns_policy_warning_dialog";
+constexpr char kBraveVPNShowNotificationDialog[] =
+    "brave.brave_vpn.show_notification_dialog";
 constexpr char kBraveVPNEnvironment[] = "brave.brave_vpn.env";
 // Dict that has subscriber credential its expiration date.
 constexpr char kBraveVPNSubscriberCredential[] =
