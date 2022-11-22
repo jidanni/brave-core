@@ -1,6 +1,7 @@
 source_set("bookmark") {
   # Remove when https://github.com/brave/brave-browser/issues/10654 is resolved.
   check_includes = false
+  assert(!is_android)
   sources = [
     "bookmark_prefs_service.cc",
     "bookmark_prefs_service.h",
