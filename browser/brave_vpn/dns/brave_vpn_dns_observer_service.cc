@@ -243,8 +243,8 @@ void BraveVpnDnsObserverService::UnlockDNS() {
 }
 
 void BraveVpnDnsObserverService::LockDNS(const std::string& servers) {
-  SetDNSOverHTTPSMode(SecureDnsConfig::kModeSecure, GetDoHServers(&servers));
   profile_prefs_->SetBoolean(prefs::kBraveVPNUserConfigLocked, true);
+  SetDNSOverHTTPSMode(SecureDnsConfig::kModeSecure, GetDoHServers(&servers));
   ShowMessageWhyWeOverrideDNSSettings();
 }
 
