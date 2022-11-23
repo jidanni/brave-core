@@ -159,9 +159,7 @@ bool BraveVpnDnsObserverService::ShouldAllowExternalChanges() const {
   if (allow_changes_for_testing_.has_value())
     return allow_changes_for_testing_.value();
 
-  return IsDNSSecure(SystemNetworkContextManager::GetStubResolverConfigReader()
-                         ->GetSecureDnsConfiguration(false)) ||
-         (chrome::ShowQuestionMessageBoxSync(
+  return (chrome::ShowQuestionMessageBoxSync(
               GetAnchorBrowserWindow(),
               l10n_util::GetStringUTF16(IDS_PRODUCT_NAME),
               l10n_util::GetStringUTF16(IDS_BRAVE_VPN_DNS_CHANGE_ALERT)) ==
@@ -203,16 +201,19 @@ void BraveVpnDnsObserverService::ShowMessageWhyWeOverrideDNSSettings() {
 void BraveVpnDnsObserverService::OnDNSPrefChanged() {
   if (ignore_prefs_change_)
     return;
+  bool is_dns_secure =
+      IsDNSSecure(SystemNetworkContextManager::GetStubResolverConfigReader()
+                      ->GetSecureDnsConfiguration(false));
+  if (is_dns_secure)
+    return;
   // Reset saved config and keep user's choice.
   if (!ShouldAllowExternalChanges()) {
     ignore_prefs_change_ = true;
     const auto& saved_dns_config =
         profile_prefs_->GetDict(prefs::kBraveVPNUserConfig);
-    if (!saved_dns_config.empty()) {
-      auto* servers_to_restore = saved_dns_config.FindString(kDohServersValue);
-      SetDNSOverHTTPSMode(SecureDnsConfig::kModeSecure,
-                          GetDoHServers(servers_to_restore));
-    }
+    auto* servers_to_restore = saved_dns_config.FindString(kDohServersValue);
+    SetDNSOverHTTPSMode(SecureDnsConfig::kModeSecure,
+                        GetDoHServers(servers_to_restore));
     ignore_prefs_change_ = false;
   } else {
     auto dns_config = SystemNetworkContextManager::GetStubResolverConfigReader()
@@ -251,9 +252,9 @@ void BraveVpnDnsObserverService::LockDNS(const std::string& servers) {
 void BraveVpnDnsObserverService::OnConnectionStateChanged(
     brave_vpn::mojom::ConnectionState state) {
   if (state == brave_vpn::mojom::ConnectionState::CONNECTED) {
-    ignore_prefs_change_ = false;
     auto dns_config = SystemNetworkContextManager::GetStubResolverConfigReader()
                           ->GetSecureDnsConfiguration(false);
+
     SaveUserDNSConfig(profile_prefs_, dns_config);
     if (!IsDNSSecure(SystemNetworkContextManager::GetStubResolverConfigReader()
                          ->GetSecureDnsConfiguration(false))) {
@@ -266,6 +267,7 @@ void BraveVpnDnsObserverService::OnConnectionStateChanged(
 
       LockDNS(dns_config.doh_servers().ToString());
     }
+    ignore_prefs_change_ = false;
   } else if (state == brave_vpn::mojom::ConnectionState::DISCONNECTED) {
     ignore_prefs_change_ = true;
     UnlockDNS();

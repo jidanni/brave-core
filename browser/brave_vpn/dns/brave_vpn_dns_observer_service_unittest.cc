@@ -383,7 +383,7 @@ TEST_F(BraveVpnDnsObserverServiceUnitTest, AllowUsersChange) {
     ExpectDNSMode(SecureDnsConfig::kModeAutomatic, "");
     FireBraveVPNStateChange(mojom::ConnectionState::CONNECTED);
     ExpectDNSMode(SecureDnsConfig::kModeSecure, default_servers);
-    // User enabled automatic DoH mode while vpn connected.
+    // User disabled DoH mode while vpn connected.
     SetDNSMode(SecureDnsConfig::kModeOff, "");
     ExpectDNSMode(SecureDnsConfig::kModeOff, "");
     FireBraveVPNStateChange(mojom::ConnectionState::DISCONNECTING);
@@ -405,7 +405,8 @@ TEST_F(BraveVpnDnsObserverServiceUnitTest, DisallowUsersChange) {
     FireBraveVPNStateChange(mojom::ConnectionState::CONNECTED);
     ExpectDNSMode(SecureDnsConfig::kModeSecure, default_servers);
 
-    // User disabled DoH mode while vpn connected.
+    // Someone is trying to disable DoH mode while vpn connected,
+    // a user doesnt allow this.
     SetDNSMode(SecureDnsConfig::kModeOff, "");
     ExpectDNSMode(SecureDnsConfig::kModeSecure, default_servers);
     FireBraveVPNStateChange(mojom::ConnectionState::DISCONNECTING);
@@ -420,7 +421,8 @@ TEST_F(BraveVpnDnsObserverServiceUnitTest, DisallowUsersChange) {
     ExpectDNSMode(SecureDnsConfig::kModeAutomatic, "");
     FireBraveVPNStateChange(mojom::ConnectionState::CONNECTED);
     ExpectDNSMode(SecureDnsConfig::kModeSecure, default_servers);
-    // User enabled automatic DoH mode while vpn connected.
+    // Someone is trying to set automatic DoH mode without system level DoH
+    // while vpn connected, a user doesnt allow this.
     SetDNSMode(SecureDnsConfig::kModeAutomatic, "");
     ExpectDNSMode(SecureDnsConfig::kModeSecure, default_servers);
     FireBraveVPNStateChange(mojom::ConnectionState::DISCONNECTING);
