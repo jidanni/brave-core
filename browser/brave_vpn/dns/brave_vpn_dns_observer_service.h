@@ -14,6 +14,7 @@
 #include "brave/components/brave_vpn/brave_vpn_service_observer.h"
 #include "components/keyed_service/core/keyed_service.h"
 #include "components/prefs/pref_change_registrar.h"
+#include "net/base/network_change_notifier.h"
 #include "net/dns/dns_config.h"
 #include "net/dns/dns_config_service.h"
 #include "third_party/abseil-cpp/absl/types/optional.h"
@@ -30,8 +31,10 @@ class CloudPolicyStore;
 
 namespace brave_vpn {
 
-class BraveVpnDnsObserverService : public brave_vpn::BraveVPNServiceObserver,
-                                   public KeyedService {
+class BraveVpnDnsObserverService
+    : public brave_vpn::BraveVPNServiceObserver,
+      public net::NetworkChangeNotifier::DNSObserver,
+      public KeyedService {
  public:
   using DnsPolicyReaderCallback =
       base::RepeatingCallback<std::string(const std::string&)>;
@@ -62,6 +65,9 @@ class BraveVpnDnsObserverService : public brave_vpn::BraveVPNServiceObserver,
     pref_service_for_testing_ = service;
   }
   bool IsDnsModeConfiguredByPolicy() const;
+
+  // net::NetworkChangeNotifier::DNSObserver implementation:
+  void OnDNSChanged() override;
 
  private:
   friend class BraveVpnDnsObserverServiceUnitTest;

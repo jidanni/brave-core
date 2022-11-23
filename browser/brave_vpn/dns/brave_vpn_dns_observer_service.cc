@@ -106,13 +106,11 @@ BraveVpnDnsObserverService::BraveVpnDnsObserverService(
     DnsPolicyReaderCallback callback)
     : policy_reader_(std::move(callback)),
       local_state_(local_state),
-      profile_prefs_(profile_prefs),
-      dns_config_service_(net::DnsConfigService::CreateSystemService()) {
+      profile_prefs_(profile_prefs) {
   DCHECK(profile_prefs_);
   DCHECK(local_state_);
-  dns_config_service_->WatchConfig(
-      base::BindRepeating(&BraveVpnDnsObserverService::OnSystemDNSConfigChanged,
-                          weak_ptr_factory_.GetWeakPtr()));
+
+  net::NetworkChangeNotifier::AddDNSObserver(this);
   pref_change_registrar_.Init(local_state);
   pref_change_registrar_.Add(
       ::prefs::kDnsOverHttpsMode,
@@ -124,11 +122,23 @@ BraveVpnDnsObserverService::BraveVpnDnsObserverService(
                           weak_ptr_factory_.GetWeakPtr()));
 }
 
-BraveVpnDnsObserverService::~BraveVpnDnsObserverService() = default;
+BraveVpnDnsObserverService::~BraveVpnDnsObserverService() {
+  net::NetworkChangeNotifier::RemoveDNSObserver(this);
+}
+
+void BraveVpnDnsObserverService::OnDNSChanged() {
+  // Re-create service for reading config once becasue the service keeps
+  // the callback and cannot read multiple times.
+  dns_config_service_ = net::DnsConfigService::CreateSystemService();
+  dns_config_service_->ReadConfig(
+      base::BindRepeating(&BraveVpnDnsObserverService::OnSystemDNSConfigChanged,
+                          weak_ptr_factory_.GetWeakPtr()));
+}
 
 void BraveVpnDnsObserverService::OnSystemDNSConfigChanged(
     const net::DnsConfig& config) {
   system_dns_config_ = config;
+  dns_config_service_.reset();
 }
 
 bool BraveVpnDnsObserverService::IsDNSSecure(
@@ -204,6 +214,10 @@ void BraveVpnDnsObserverService::OnDNSPrefChanged() {
                           GetDoHServers(servers_to_restore));
     }
     ignore_prefs_change_ = false;
+  } else {
+    auto dns_config = SystemNetworkContextManager::GetStubResolverConfigReader()
+                          ->GetSecureDnsConfiguration(false);
+    SaveUserDNSConfig(profile_prefs_, dns_config);
   }
 }
 
