@@ -8,11 +8,12 @@
 
 #include "brave/browser/ui/toolbar/brave_bookmark_context_menu_controller.h"
 
-#define BookmarkContextMenuController         \
-  BraveBookmarkContextMenuController > dummy; \
-  friend class BraveBookmarkContextMenu;      \
-  std::unique_ptr < BraveBookmarkContextMenuController
+#define BookmarkContextMenuController BraveBookmarkContextMenuController
+#define close_on_remove_ \
+  close_on_remove_;      \
+  friend class BraveBookmarkContextMenu
 #include "src/chrome/browser/ui/views/bookmarks/bookmark_context_menu.h"
 #undef BookmarkContextMenuController
+#undef close_on_remove_
 
 #endif  // BRAVE_CHROMIUM_SRC_CHROME_BROWSER_UI_VIEWS_BOOKMARKS_BOOKMARK_CONTEXT_MENU_H_
