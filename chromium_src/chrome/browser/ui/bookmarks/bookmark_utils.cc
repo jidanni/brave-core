@@ -22,6 +22,7 @@ void ToggleBookmarkBarWhenVisible_ChromiumImpl(
     content::BrowserContext* browser_context);
 
 void BraveToggleBookmarkBarState(content::BrowserContext* browser_context) {
+  ToggleBookmarkBarWhenVisible_ChromiumImpl(browser_context);
   auto* prefs = user_prefs::UserPrefs::Get(browser_context);
   // On macOS with the View menu or via hotkeys, the options Always show
   // bookmarks is a checkbox. We will keep that checkbox to be Always and Never.
@@ -30,7 +31,7 @@ void BraveToggleBookmarkBarState(content::BrowserContext* browser_context) {
   if (always_show) {
     prefs->SetBoolean(kAlwaysShowBookmarkBarOnNTP, false);
   }
-  ToggleBookmarkBarWhenVisible_ChromiumImpl(browser_context);
+
 }
 
 }  // namespace chrome
