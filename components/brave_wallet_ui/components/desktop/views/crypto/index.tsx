@@ -38,7 +38,7 @@ import { AddAccountModal } from '../../popup-modals/add-account-modal/add-accoun
 import { NftView } from '../nfts/nft-view'
 import { ConfirmPasswordModal } from '../../popup-modals/confirm-password-modal/confirm-password-modal'
 import { AccountSettingsModal } from '../../popup-modals/account-settings-modal/account-settings-modal'
-import { RunLocalIpfsNode } from '../../run-local-ipfs-node/run-local-ipfs-node'
+import { LocalIpfsNodeScreen } from '../../local-ipfs-node/local-ipfs-node'
 
 interface ParamsType {
   category?: TopTabNavTypes
@@ -133,6 +133,10 @@ const CryptoView = (props: Props) => {
     () => onShowVisibleAssetsModal(false),
     [onShowVisibleAssetsModal]
   )
+
+  const onClose = React.useCallback(() => {
+    history.goBack()
+  }, [])
 
   const showBanner = React.useMemo((): boolean => {
     return (
@@ -245,8 +249,8 @@ const CryptoView = (props: Props) => {
           <NftView />
         </Route>
 
-        <Route path={'/crypto/run-node'} exact={true}>
-          <RunLocalIpfsNode onClose={() => {}} />
+        <Route path={WalletRoutes.LocalIpfsNode} exact={true}>
+          <LocalIpfsNodeScreen onClose={onClose} />
         </Route>
 
         <Redirect to={sessionRoute || WalletRoutes.Portfolio} />

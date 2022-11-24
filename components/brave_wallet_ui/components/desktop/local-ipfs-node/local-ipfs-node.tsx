@@ -4,6 +4,7 @@
 // you can obtain one at https://mozilla.org/MPL/2.0/.
 
 import * as React from 'react'
+import { Row } from '../../shared/style'
 
 // styles
 import {
@@ -23,14 +24,16 @@ import {
   BenefitHeading,
   LeftWrapper,
   RightWrapper,
-  BenefitsList
-} from './run-local-ipfs-node.styles'
+  BenefitsList,
+  IpfsNodeRunningStatus,
+  IpfsStatus
+} from './local-ipfs-node.styles'
 
 interface Props {
   onClose: () => void
 }
 
-export const RunLocalIpfsNode = (props: Props) => {
+export const LocalIpfsNodeScreen = (props: Props) => {
   const { onClose } = props
 
   return (
@@ -67,7 +70,13 @@ export const RunLocalIpfsNode = (props: Props) => {
         </Section>
         <Section>
           <LeftWrapper>
-            <RunLocalNodeButton>Run my local IPFS Node</RunLocalNodeButton>
+            <Row gap='16px' alignItems='center' justifyContent='flex-start'>
+              <RunLocalNodeButton>Run my local IPFS Node</RunLocalNodeButton>
+              <IpfsNodeRunningStatus>
+                <IpfsStatus />
+                You’re running IPFS node
+              </IpfsNodeRunningStatus>
+            </Row>
             <CheckNftsButton>Check which NFTs of mine can be pinned</CheckNftsButton>
           </LeftWrapper>
           <RightWrapper>

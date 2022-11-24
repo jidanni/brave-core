@@ -16,7 +16,7 @@ import { LoadingSkeleton } from '../components/shared'
 import { ChartControlBar } from '../components/desktop/chart-control-bar/chart-control-bar'
 import { BuySendSwapDepositNav } from '../components/desktop/buy-send-swap-deposit-nav/buy-send-swap-deposit-nav'
 import { NftIpfsBanner } from '../components/desktop/nft-ipfs-banner/nft-ipfs-banner'
-import { RunLocalIpfsNode } from '../components/desktop/run-local-ipfs-node/run-local-ipfs-node'
+import { LocalIpfsNodeScreen } from '../components/desktop/local-ipfs-node/local-ipfs-node'
 
 export default {
   title: 'Wallet/Desktop/Components',
@@ -153,8 +153,8 @@ export const _RunLocalIpfs = () => {
   }
 
   return (
-    <RunLocalIpfsNode
-    onClose={onClose}
+    <LocalIpfsNodeScreen
+      onClose={onClose}
     />
   )
 }

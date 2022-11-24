@@ -4,6 +4,8 @@
 // you can obtain one at https://mozilla.org/MPL/2.0/.
 
 import * as React from 'react'
+import { useHistory } from 'react-router'
+import { WalletRoutes } from '../../../constants/types'
 
 interface Props {
   onDismiss: () => void
@@ -19,11 +21,17 @@ import {
 } from './nft-ipfs-banner.styles'
 
 export const NftIpfsBanner = ({ onDismiss }: Props) => {
+  const history = useHistory()
+
+  const onLearnMore = React.useCallback(() => {
+    history.push(WalletRoutes.LocalIpfsNode)
+  }, [])
+
   return (
     <StyledWrapper>
       <Ipfs />
       <Text>Now you can run your IPFS and be part of web 3. Your NFT data will stay online forever and cannot be tampered with.&nbsp;
-        <LearnMore>Learn more</LearnMore>
+        <LearnMore onClick={onLearnMore}>Learn more</LearnMore>
       </Text>
       <CloseButton onClick={onDismiss}/>
     </StyledWrapper>
