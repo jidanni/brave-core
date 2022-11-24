@@ -21,10 +21,6 @@ class BookmarkBarSubMenuModel : public ui::SimpleMenuModel,
 
   ~BookmarkBarSubMenuModel() override;
 
-  enum BookmarkBarState { ALWAYS = 0, NEVER = 1, NTP = 2 };
-
-  BookmarkBarState GetBookmarkBarStateFromPrefs() const;
-  void SaveBookmarkBarStateToPrefs(BookmarkBarState state);
   // ui::SimpleMenuModel::Delegate
   void ExecuteCommand(int command_id, int event_flags) override;
   bool IsCommandIdChecked(int command_id) const override;

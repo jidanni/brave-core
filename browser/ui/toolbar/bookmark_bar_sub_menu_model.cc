@@ -5,12 +5,11 @@
 
 #include "brave/browser/ui/toolbar/bookmark_bar_sub_menu_model.h"
 
-#include "brave/components/constants/pref_names.h"
+#include "brave/browser/ui/bookmark/bookmark_helper.h"
 #include "chrome/app/chrome_command_ids.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/ui/browser.h"
 #include "chrome/grit/generated_resources.h"
-#include "components/bookmarks/common/bookmark_pref_names.h"
 #include "components/prefs/pref_service.h"
 #include "ui/base/models/simple_menu_model.h"
 
@@ -35,24 +34,27 @@ void BookmarkBarSubMenuModel::Build() {
 void BookmarkBarSubMenuModel::ExecuteCommand(int command_id, int event_flags) {
   switch (command_id) {
     case IDC_BRAVE_BOOKMARK_BAR_ALWAYS:
-      SaveBookmarkBarStateToPrefs(BookmarkBarState::ALWAYS);
+      brave::SetBookmarkState(brave::BookmarkBarState::ALWAYS,
+                              profile_->GetPrefs());
       return;
     case IDC_BRAVE_BOOKMARK_BAR_NEVER:
-      SaveBookmarkBarStateToPrefs(BookmarkBarState::NEVER);
+      brave::SetBookmarkState(brave::BookmarkBarState::NEVER,
+                              profile_->GetPrefs());
       return;
     case IDC_BRAVE_BOOKMARK_BAR_NTP:
-      SaveBookmarkBarStateToPrefs(BookmarkBarState::NTP);
+      brave::SetBookmarkState(brave::BookmarkBarState::NTP,
+                              profile_->GetPrefs());
       return;
   }
 }
 
 bool BookmarkBarSubMenuModel::IsCommandIdChecked(int command_id) const {
-  switch (GetBookmarkBarStateFromPrefs()) {
-    case BookmarkBarState::ALWAYS:
+  switch (brave::GetBookmarkBarState(profile_->GetPrefs())) {
+    case brave::BookmarkBarState::ALWAYS:
       return command_id == IDC_BRAVE_BOOKMARK_BAR_ALWAYS;
-    case BookmarkBarState::NTP:
+    case brave::BookmarkBarState::NTP:
       return command_id == IDC_BRAVE_BOOKMARK_BAR_NTP;
-    case BookmarkBarState::NEVER:
+    case brave::BookmarkBarState::NEVER:
       return command_id == IDC_BRAVE_BOOKMARK_BAR_NEVER;
   }
   return false;
@@ -62,32 +64,4 @@ bool BookmarkBarSubMenuModel::IsCommandIdEnabled(int command_id) const {
   return (command_id == IDC_BRAVE_BOOKMARK_BAR_ALWAYS ||
           command_id == IDC_BRAVE_BOOKMARK_BAR_NEVER ||
           command_id == IDC_BRAVE_BOOKMARK_BAR_NTP);
-}
-
-BookmarkBarSubMenuModel::BookmarkBarState
-BookmarkBarSubMenuModel::GetBookmarkBarStateFromPrefs() const {
-  // kShowBookmarkBar has higher priority and the bookmark bar is shown always.
-  if (profile_->GetPrefs()->GetBoolean(bookmarks::prefs::kShowBookmarkBar))
-    return BookmarkBarState::ALWAYS;
-  // kShowBookmarkBar is false, kAlwaysShowBookmarkBarOnNTP is true
-  // -> the bookmark bar is shown only for NTP.
-  if (profile_->GetPrefs()->GetBoolean(kAlwaysShowBookmarkBarOnNTP))
-    return BookmarkBarState::NTP;
-  // NEVER show the bookmark bar.
-  return BookmarkBarState::NEVER;
-}
-
-void BookmarkBarSubMenuModel::SaveBookmarkBarStateToPrefs(
-    BookmarkBarState state) {
-  auto* prefs = profile_->GetPrefs();
-  if (state == BookmarkBarState::ALWAYS) {
-    prefs->SetBoolean(bookmarks::prefs::kShowBookmarkBar, true);
-    prefs->SetBoolean(kAlwaysShowBookmarkBarOnNTP, true);
-  } else if (state == BookmarkBarState::NTP) {
-    prefs->SetBoolean(bookmarks::prefs::kShowBookmarkBar, false);
-    prefs->SetBoolean(kAlwaysShowBookmarkBarOnNTP, true);
-  } else {
-    prefs->SetBoolean(bookmarks::prefs::kShowBookmarkBar, false);
-    prefs->SetBoolean(kAlwaysShowBookmarkBarOnNTP, false);
-  }
 }

@@ -4,6 +4,7 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 #include "chrome/browser/ui/bookmarks/bookmark_utils.h"
+#include "brave/browser/ui/bookmark/bookmark_helper.h"
 #include "brave/components/constants/pref_names.h"
 #include "build/build_config.h"
 #include "chrome/grit/theme_resources.h"
@@ -28,10 +29,9 @@ void BraveToggleBookmarkBarState(content::BrowserContext* browser_context) {
   // bookmarks is a checkbox. We will keep that checkbox to be Always and Never.
   const bool always_show =
       prefs->GetBoolean(bookmarks::prefs::kShowBookmarkBar);
-  if (always_show) {
-    prefs->SetBoolean(kAlwaysShowBookmarkBarOnNTP, false);
-  }
-
+  brave::SetBookmarkState(always_show ? brave::BookmarkBarState::ALWAYS
+                                      : brave::BookmarkBarState::NEVER,
+                          prefs);
 }
 
 }  // namespace chrome
