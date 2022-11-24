@@ -152,7 +152,7 @@ BraveRenderViewContextMenu::BraveRenderViewContextMenu(
 
 bool BraveRenderViewContextMenu::IsCommandIdEnabled(int id) const {
   switch (id) {
-    case IDC_COPY_CLEAN_LINK:
+    case IDC_COPY_STRICTLY_CLEANED_LINK:
       return params_.link_url.is_valid();
     case IDC_CONTENT_CONTEXT_FORCE_PASTE:
       // only enable if there is plain text data to paste - this is what
@@ -221,8 +221,8 @@ void BraveRenderViewContextMenu::ExecuteIPFSCommand(int id, int event_flags) {
 
 void BraveRenderViewContextMenu::ExecuteCommand(int id, int event_flags) {
   switch (id) {
-    case IDC_COPY_CLEAN_LINK:
-      brave::CopyLinkWithStrictCleaning(GetBrowser(), params_.link_url);
+    case IDC_COPY_STRICTLY_CLEANED_LINK:
+      brave::CopyStrictlyCleanedURL(GetBrowser(), params_.link_url);
       break;
     case IDC_CONTENT_CONTEXT_FORCE_PASTE: {
       std::u16string result;
@@ -406,7 +406,7 @@ void BraveRenderViewContextMenu::InitMenu() {
         menu_model_.GetIndexOfCommandId(IDC_CONTENT_CONTEXT_COPYLINKLOCATION);
     if (link_index.has_value()) {
       menu_model_.InsertItemWithStringIdAt(
-          link_index.value() + 1, IDC_COPY_CLEAN_LINK, IDS_COPY_CLEAN_LINK);
+          link_index.value() + 1, IDC_COPY_STRICTLY_CLEANED_LINK, IDS_COPY_CLEAN_LINK);
     }
   }
 

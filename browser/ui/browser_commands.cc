@@ -204,7 +204,7 @@ void CopySanitizedURL(Browser* browser, const GURL& url) {
 // - Debouncer (potentially debouncing many levels)
 // - Query filter
 // - URLSanitizerService
-void CopyLinkWithStrictCleaning(Browser* browser, const GURL& url) {
+void CopyStrictlyCleanedURL(Browser* browser, const GURL& url) {
   DCHECK(url.SchemeIsHTTPOrHTTPS());
   GURL final_url;
   // Apply debounce rules.
