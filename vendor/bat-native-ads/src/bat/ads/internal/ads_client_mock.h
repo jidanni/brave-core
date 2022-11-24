@@ -30,7 +30,10 @@ class AdsClientMock : public AdsClient {
 
   ~AdsClientMock() override;
 
-  MOCK_METHOD1(AddBatAdsClientObserver, void(AdsClientObserver*));
+  MOCK_METHOD1(AddObserver, void(AdsClientObserver*));
+  MOCK_METHOD1(RemoveObserver, void(AdsClientObserver*));
+
+  MOCK_METHOD0(BindObservers, void());
 
   MOCK_CONST_METHOD0(IsNetworkConnectionAvailable, bool());
 

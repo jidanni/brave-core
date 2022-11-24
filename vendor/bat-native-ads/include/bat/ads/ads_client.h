@@ -30,7 +30,13 @@ class ADS_EXPORT AdsClient {
   virtual ~AdsClient() = default;
 
   // Called to add an ads client observer.
-  virtual void AddBatAdsClientObserver(AdsClientObserver* observer) = 0;
+  virtual void AddObserver(AdsClientObserver* observer) = 0;
+
+  // Called to remove an ads client observer.
+  virtual void RemoveObserver(AdsClientObserver* observer) = 0;
+
+  // Called to bind observers when ads are initialized.
+  virtual void BindObservers() = 0;
 
   // Returns |true| if there is an available network connection.
   virtual bool IsNetworkConnectionAvailable() const = 0;

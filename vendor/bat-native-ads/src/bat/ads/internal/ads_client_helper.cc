@@ -41,7 +41,7 @@ void AdsClientHelper::AddObserver(AdsClientObserver* observer) {
   DCHECK(observer);
   DCHECK(!observer->IsBound());
 
-  g_ads_client_instance->AddBatAdsClientObserver(observer);
+  g_ads_client_instance->AddObserver(observer);
 }
 
 // static
@@ -49,7 +49,7 @@ void AdsClientHelper::RemoveObserver(AdsClientObserver* observer) {
   DCHECK(observer);
   DCHECK(observer->IsBound());
 
-  observer->Reset();
+  g_ads_client_instance->RemoveObserver(observer);
 }
 
 }  // namespace ads

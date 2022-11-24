@@ -482,8 +482,15 @@ ads::mojom::DBCommandResponseInfoPtr RunDBTransactionOnTaskRunner(
 
 #pragma mark - Observers
 
-- (void)addBatAdsClientObserver:(ads::AdsClientObserver*)observer {
-  ads::AddBatAdsClientObserver(observer);
+- (void)addObserver:(ads::AdsClientObserver*)observer {
+  ads->AddObserver(observer);
+}
+
+- (void)removeObserver:(ads::AdsClientObserver*)observer {
+  ads->RemoveObserver(observer);
+}
+
+- (void)notifyDidInitializeAds {
 }
 
 - (void)applicationDidBecomeActive {
