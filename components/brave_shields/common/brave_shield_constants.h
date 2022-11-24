@@ -3,7 +3,6 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-
 #ifndef BRAVE_COMPONENTS_BRAVE_SHIELDS_COMMON_BRAVE_SHIELD_CONSTANTS_H_
 #define BRAVE_COMPONENTS_BRAVE_SHIELDS_COMMON_BRAVE_SHIELD_CONSTANTS_H_
 
@@ -73,7 +72,8 @@ constexpr webui::LocalizedString kLocalizedStrings[] = {
      IDS_BRAVE_SHIELDS_CROSS_COOKIES_BLOCKED},
     {"braveShieldsCookiesBlockAll", IDS_BRAVE_SHIELDS_COOKIES_BLOCKED},
     {"braveShieldsCookiesAllowedAll", IDS_BRAVE_SHIELDS_COOKIES_ALLOWED_ALL},
-    {"braveShieldsCookiesCrossCookiesAllowed", IDS_BRAVE_SHIELDS_CROSS_COOKIES_ALLOWED},
+    {"braveShieldsCookiesCrossCookiesAllowed",
+     IDS_BRAVE_SHIELDS_CROSS_COOKIES_ALLOWED},
     {"braveShieldsCookiesExclamation", IDS_BRAVE_SHIELDS_COOKIES_EXCLAMATION},
     {"braveShieldsFingerprintingBlocked",
      IDS_BRAVE_SHIELDS_FINGERPRINTING_BLOCKED},
