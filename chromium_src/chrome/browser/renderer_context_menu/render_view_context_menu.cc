@@ -405,8 +405,9 @@ void BraveRenderViewContextMenu::InitMenu() {
     absl::optional<size_t> link_index =
         menu_model_.GetIndexOfCommandId(IDC_CONTENT_CONTEXT_COPYLINKLOCATION);
     if (link_index.has_value()) {
-      menu_model_.InsertItemWithStringIdAt(
-          link_index.value() + 1, IDC_COPY_STRICTLY_CLEANED_LINK, IDS_COPY_CLEAN_LINK);
+      menu_model_.InsertItemWithStringIdAt(link_index.value() + 1,
+                                           IDC_COPY_STRICTLY_CLEANED_LINK,
+                                           IDS_COPY_CLEAN_LINK);
     }
   }
 

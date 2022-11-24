@@ -6,14 +6,10 @@
 #ifndef BRAVE_CHROMIUM_SRC_CHROME_BROWSER_UI_VIEWS_OMNIBOX_OMNIBOX_VIEW_VIEWS_H_
 #define BRAVE_CHROMIUM_SRC_CHROME_BROWSER_UI_VIEWS_OMNIBOX_OMNIBOX_VIEW_VIEWS_H_
 
-#include "ui/views/controls/textfield/textfield_controller.h"
-
-#define OnAfterCutOrCopy                                           \
-  OnAfterCutOrCopy(ui::ClipboardBuffer clipboard_buffer) override; \
-  bool SelectedTextIsURL() override;                               \
-  bool IsCleanLinkCommand(int command_id) const override;          \
-  void OnSanitizedCopy
+#define friendly_suggestion_text_ \
+  friendly_suggestion_text_;      \
+  friend class BraveOmniboxViewViews
 #include "src/chrome/browser/ui/views/omnibox/omnibox_view_views.h"
-#undef OnAfterCutOrCopy
+#undef friendly_suggestion_text_
 
 #endif  // BRAVE_CHROMIUM_SRC_CHROME_BROWSER_UI_VIEWS_OMNIBOX_OMNIBOX_VIEW_VIEWS_H_

@@ -1,29 +1,23 @@
 /* Copyright (c) 2022 The Brave Authors. All rights reserved.
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
- * You can obtain one at http://mozilla.org/MPL/2.0/. */
+ * You can obtain one at https://mozilla.org/MPL/2.0/. */
 
-#include "chrome/browser/ui/views/omnibox/omnibox_view_views.h"
-#include "base/strings/utf_string_conversions.h"
+#include "brave/browser/ui/views/omnibox/brave_omnibox_view_views.h"
+
+#include <utility>
+
 #include "brave/app/brave_command_ids.h"
-#include "brave/browser/ui/views/omnibox/brave_omnibox_popup_contents_view.h"
 #include "brave/browser/url_sanitizer/url_sanitizer_service_factory.h"
 #include "brave/components/url_sanitizer/browser/url_sanitizer_service.h"
-#include "brave/grit/brave_generated_resources.h"
 #include "chrome/browser/profiles/profile.h"
-#include "chrome/browser/translate/chrome_translate_client.h"
-#include "chrome/browser/ui/browser_dialogs.h"
-#include "chrome/browser/ui/views/frame/browser_view.h"
 #include "chrome/browser/ui/views/location_bar/location_bar_view.h"
-#include "chrome/browser/ui/views/send_tab_to_self/send_tab_to_self_bubble_controller.h"
 #include "chrome/grit/generated_resources.h"
+#include "components/omnibox/browser/omnibox_edit_controller.h"
 #include "components/omnibox/browser/omnibox_edit_model.h"
-#include "components/strings/grit/components_strings.h"
 #include "ui/base/clipboard/scoped_clipboard_writer.h"
-#include "ui/views/controls/textfield/textfield.h"
 
 namespace {
-
 void BraveUpdateContextMenu(ui::SimpleMenuModel* menu_contents, GURL url) {
   if (!url.SchemeIsHTTPOrHTTPS())
     return;
@@ -34,7 +28,6 @@ void BraveUpdateContextMenu(ui::SimpleMenuModel* menu_contents, GURL url) {
   menu_contents->InsertItemWithStringIdAt(
       copy_position.value() + 1, IDC_COPY_CLEAN_LINK, IDS_COPY_CLEAN_LINK);
 }
-
 void BraveCopyCleanURL(Profile* profile,
                        OmniboxEditModel* model,
                        int sel_min,
@@ -52,13 +45,23 @@ void BraveCopyCleanURL(Profile* profile,
   scoped_clipboard_writer.WriteText(base::UTF8ToUTF16(sanitized_url.spec()));
 }
 
-int GetSearchEnginesID() {
-  return IDS_MANAGE_SEARCH_ENGINES_AND_SITE_SEARCH;
-}
-
 }  // namespace
 
-bool OmniboxViewViews::SelectedTextIsURL() {
+BraveOmniboxViewViews::BraveOmniboxViewViews(
+    OmniboxEditController* controller,
+    std::unique_ptr<OmniboxClient> client,
+    bool popup_window_mode,
+    LocationBarView* location_bar,
+    const gfx::FontList& font_list)
+    : OmniboxViewViews(controller,
+                       std::move(client),
+                       popup_window_mode,
+                       location_bar,
+                       font_list) {}
+
+BraveOmniboxViewViews::~BraveOmniboxViewViews() = default;
+
+bool BraveOmniboxViewViews::SelectedTextIsURL() {
   GURL url;
   bool write_url = false;
   std::u16string selected_text = GetSelectedText();
@@ -67,31 +70,29 @@ bool OmniboxViewViews::SelectedTextIsURL() {
   return write_url;
 }
 
-bool OmniboxViewViews::IsCleanLinkCommand(int command_id) const {
+bool BraveOmniboxViewViews::IsCleanLinkCommand(int command_id) const {
   return command_id == IDC_COPY_CLEAN_LINK;
 }
 
-void OmniboxViewViews::OnSanitizedCopy(ui::ClipboardBuffer clipboard_buffer) {
+void BraveOmniboxViewViews::OnSanitizedCopy(
+    ui::ClipboardBuffer clipboard_buffer) {
   ExecuteCommand(IDC_COPY_CLEAN_LINK, 0);
 }
 
-#define ShowBubble                                                     \
-  ShowBubble();                                                        \
-  return;                                                              \
-  case IDC_COPY_CLEAN_LINK:                                            \
-    BraveCopyCleanURL(location_bar_view_->profile(), model(),          \
-                      GetSelectedRange().GetMin(), GetSelectedText()); \
-    GetSelectedText
+void BraveOmniboxViewViews::ExecuteCommand(int command_id, int event_flags) {
+  if (command_id == IDC_COPY_CLEAN_LINK) {
+    BraveCopyCleanURL(location_bar_view_->profile(), model(),
+                      GetSelectedRange().GetMin(), GetSelectedText());
+    return;
+  }
+  OmniboxViewViews::ExecuteCommand(command_id, event_flags);
+}
 
-#undef IDS_MANAGE_SEARCH_ENGINES_AND_SITE_SEARCH
-#define IDS_MANAGE_SEARCH_ENGINES_AND_SITE_SEARCH GetSearchEnginesID()); \
-  if (model()->CurrentTextIsURL() && !GetSelectedText().empty())         \
-    BraveUpdateContextMenu(menu_contents, \
-                           controller()->GetLocationBarModel()->GetURL()
-#define OmniboxPopupContentsView BraveOmniboxPopupContentsView
-#include "src/chrome/browser/ui/views/omnibox/omnibox_view_views.cc"
-#undef OmniboxPopupContentsView
-#undef IDS_MANAGE_SEARCH_ENGINES_AND_SITE_SEARCH
-#define IDS_MANAGE_SEARCH_ENGINES_AND_SITE_SEARCH GetSearchEnginesID()
-
-#undef ShowBubble
+void BraveOmniboxViewViews::UpdateContextMenu(
+    ui::SimpleMenuModel* menu_contents) {
+  OmniboxViewViews::UpdateContextMenu(menu_contents);
+  if (model()->CurrentTextIsURL() && !GetSelectedText().empty()) {
+    BraveUpdateContextMenu(menu_contents,
+                           controller()->GetLocationBarModel()->GetURL());
+  }
+}
