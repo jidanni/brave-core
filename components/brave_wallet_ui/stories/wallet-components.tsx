@@ -17,6 +17,8 @@ import { ChartControlBar } from '../components/desktop/chart-control-bar/chart-c
 import { BuySendSwapDepositNav } from '../components/desktop/buy-send-swap-deposit-nav/buy-send-swap-deposit-nav'
 import { NftIpfsBanner } from '../components/desktop/nft-ipfs-banner/nft-ipfs-banner'
 import { LocalIpfsNodeScreen } from '../components/desktop/local-ipfs-node/local-ipfs-node'
+import { InspectNftsScreen } from '../components/desktop/inspect-nfts/inspect-nfts'
+import WalletPageStory from './wrappers/wallet-page-story-wrapper'
 
 export default {
   title: 'Wallet/Desktop/Components',
@@ -147,7 +149,7 @@ _NftIpfsBanner.story = {
   name: 'NFT IPFS Banner'
 }
 
-export const _RunLocalIpfs = () => {
+export const _LocalIpfsScreen = () => {
   const onClose = () => {
     console.log('close')
   }
@@ -159,6 +161,27 @@ export const _RunLocalIpfs = () => {
   )
 }
 
-_RunLocalIpfs.story = {
+_LocalIpfsScreen.story = {
   name: 'Run Local IPFS Node'
+}
+
+export const _InspectNftsScreen = () => {
+  const onClose = () => {
+    console.log('on close')
+  }
+  const onBack = () => {
+    console.log('on back')
+  }
+  return (
+    <WalletPageStory>
+      <InspectNftsScreen
+        onClose={onClose}
+        onBack={onBack}
+      />
+    </WalletPageStory>
+  )
+}
+
+_InspectNftsScreen.story = {
+  name: 'Inspect NFTs Screen'
 }

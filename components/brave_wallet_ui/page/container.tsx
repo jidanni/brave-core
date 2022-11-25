@@ -158,7 +158,8 @@ export const Container = () => {
       walletLocation.includes(WalletRoutes.Nfts) ||
       walletLocation.includes(WalletRoutes.Swap) ||
       walletLocation.includes(WalletRoutes.Send) ||
-      walletLocation.includes(WalletRoutes.LocalIpfsNode)
+      walletLocation.includes(WalletRoutes.LocalIpfsNode ||
+      walletLocation.includes(WalletRoutes.InspectNfts))
     ) {
       setSessionRoute(walletLocation)
     }
@@ -173,7 +174,8 @@ export const Container = () => {
         walletLocation === WalletRoutes.Send ||
         walletLocation.includes(WalletRoutes.DepositFundsPage) ||
         walletLocation.includes(WalletRoutes.FundWalletPage) ||
-        walletLocation.includes(WalletRoutes.LocalIpfsNode)
+        walletLocation.includes(WalletRoutes.LocalIpfsNode) ||
+        walletLocation.includes(WalletRoutes.InspectNfts)
       ) {
         toobarElement.hidden = true
         rootElement.style.setProperty('min-height', '100vh')

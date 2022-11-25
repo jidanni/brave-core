@@ -39,6 +39,7 @@ import { NftView } from '../nfts/nft-view'
 import { ConfirmPasswordModal } from '../../popup-modals/confirm-password-modal/confirm-password-modal'
 import { AccountSettingsModal } from '../../popup-modals/account-settings-modal/account-settings-modal'
 import { LocalIpfsNodeScreen } from '../../local-ipfs-node/local-ipfs-node'
+import { InspectNftsScreen } from '../../inspect-nfts/inspect-nfts'
 
 interface ParamsType {
   category?: TopTabNavTypes
@@ -249,8 +250,13 @@ const CryptoView = (props: Props) => {
           <NftView />
         </Route>
 
+        {/* NFT Pinning */}
         <Route path={WalletRoutes.LocalIpfsNode} exact={true}>
           <LocalIpfsNodeScreen onClose={onClose} />
+        </Route>
+
+        <Route path={WalletRoutes.InspectNfts} exact={true}>
+          <InspectNftsScreen onClose={onClose} onBack={onClose} />
         </Route>
 
         <Redirect to={sessionRoute || WalletRoutes.Portfolio} />

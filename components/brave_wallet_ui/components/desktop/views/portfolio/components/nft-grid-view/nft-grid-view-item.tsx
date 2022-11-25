@@ -9,7 +9,6 @@ import * as React from 'react'
 import { UserAssetInfoType } from 'components/brave_wallet_ui/constants/types'
 
 // Utils
-import { stripERC20TokenImageURL, httpifyIpfsUrl } from '../../../../../../utils/string-utils'
 import Amount from '../../../../../../utils/amount'
 import { NftIcon } from '../../../../../shared/nft-icon/nft-icon'
 
@@ -28,11 +27,6 @@ interface Props {
 
 export const NFTGridViewItem = (props: Props) => {
   const { token, onSelectAsset } = props
-  const tokenImageURL = stripERC20TokenImageURL(token.asset.logo)
-
-  const remoteImage = React.useMemo(() => {
-    return httpifyIpfsUrl(tokenImageURL)
-  }, [tokenImageURL])
 
   return (
     <NFTButton
@@ -40,7 +34,7 @@ export const NFTGridViewItem = (props: Props) => {
     >
       <IconWrapper>
         <DIVForClickableArea />
-        <NftIcon icon={remoteImage} responsive={true} />
+        <NftIcon icon={token.asset.logo} responsive={true} />
       </IconWrapper>
       <NFTText>{token.asset.name} {token.asset.tokenId ? '#' + new Amount(token.asset.tokenId).toNumber() : ''}</NFTText>
     </NFTButton>

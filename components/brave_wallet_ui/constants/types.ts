@@ -748,7 +748,8 @@ export enum WalletRoutes {
   Send = '/send',
 
   // NFT Pining
-  LocalIpfsNode = '/crypto/local-ipfs-node'
+  LocalIpfsNode = '/crypto/local-ipfs-node',
+  InspectNfts = '/crypto/inspect-nfs'
 }
 
 export const WalletOrigin = 'chrome://wallet'

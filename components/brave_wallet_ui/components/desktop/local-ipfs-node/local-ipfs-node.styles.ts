@@ -16,18 +16,16 @@ export const RunNodeWrapper = styled.div`
   flex-direction: column;
   position: relative;
   width: 100vw;
-  height: 100vh;
+  position: relative;
+  left: calc(-50vw + 50%);
+  overflow-x: hidden;
   background-image: url(${Background});
   background-size: cover;
   background-repeat: no-repeat;
   padding-top: 68px;
   background-position: 0px 0px;
   margin-top: -32px;
-
-
-  @media (min-width: 1024px) {
-    overflow: hidden;
-  }
+  margin-right: -114px;
 `
 
 export const TopRow = styled.div`
@@ -275,4 +273,10 @@ export const IpfsStatus = styled.span`
   mask-repeat: no-repeat;
   mask-size: 8px;
   margin-right: 8px;
+`
+
+export const NftIllustration = styled.img`
+  width: 100%;
+  height: auto;
+  margin-top: 60px;
 `

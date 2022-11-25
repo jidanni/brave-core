@@ -4,7 +4,11 @@
 // you can obtain one at https://mozilla.org/MPL/2.0/.
 
 import * as React from 'react'
+import { useHistory } from 'react-router'
+import { WalletRoutes } from '../../../constants/types'
 import { Row } from '../../shared/style'
+
+import Illustration from '../../../assets/svg-icons/nft-ipfs/nfts-illustration.svg'
 
 // styles
 import {
@@ -26,7 +30,8 @@ import {
   RightWrapper,
   BenefitsList,
   IpfsNodeRunningStatus,
-  IpfsStatus
+  IpfsStatus,
+  NftIllustration
 } from './local-ipfs-node.styles'
 
 interface Props {
@@ -35,6 +40,11 @@ interface Props {
 
 export const LocalIpfsNodeScreen = (props: Props) => {
   const { onClose } = props
+  const history = useHistory()
+
+  const onClickCheckNfts = React.useCallback(() => {
+    history.push(WalletRoutes.InspectNfts)
+  }, [])
 
   return (
     <RunNodeWrapper>
@@ -77,7 +87,7 @@ export const LocalIpfsNodeScreen = (props: Props) => {
                 You’re running IPFS node
               </IpfsNodeRunningStatus>
             </Row>
-            <CheckNftsButton>Check which NFTs of mine can be pinned</CheckNftsButton>
+            <CheckNftsButton onClick={onClickCheckNfts}>Check which NFTs of mine can be pinned</CheckNftsButton>
           </LeftWrapper>
           <RightWrapper>
             <BenefitHeading>By running IPFS on your computer you can:</BenefitHeading>
@@ -89,6 +99,7 @@ export const LocalIpfsNodeScreen = (props: Props) => {
           </RightWrapper>
         </Section>
       </MainContent>
+      <NftIllustration src={Illustration} />
     </RunNodeWrapper>
   )
 }
