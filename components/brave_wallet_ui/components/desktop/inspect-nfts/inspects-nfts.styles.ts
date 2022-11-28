@@ -93,7 +93,7 @@ export const NftCountHeading = styled.h1`
   font-size: 40px;
   line-height: 60px;
   color: ${p => p.theme.palette.white};
-  margin: 0 auto;
+  margin: 0  0 32px 0;
   padding: 0;
 `
 
