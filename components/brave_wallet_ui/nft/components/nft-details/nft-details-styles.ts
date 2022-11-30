@@ -220,3 +220,20 @@ export const ErrorMessage = styled.p`
   word-break: break-word;
   margin-top: 50px;
 `
+
+export const NftStandard = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 2px 4px;
+  gap: 4px;
+  border: 1px solid rgba(174, 177, 194, 0.55);
+  border-radius: 4px;
+  font-family: 'Poppins';
+  font-style: normal;
+  font-weight: 500;
+  font-size: 12px;
+  line-height: 18px;
+  color: ${(p) => p.theme.color.text02};
+  margin-bottom: 6px;
+`

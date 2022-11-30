@@ -18,7 +18,8 @@ import {
   NFTText,
   IconWrapper,
   DIVForClickableArea,
-  PinnedIcon
+  PinnedIcon,
+  NFTSymbol
 } from './style'
 
 interface Props {
@@ -39,6 +40,7 @@ export const NFTGridViewItem = (props: Props) => {
         <PinnedIcon />
       </IconWrapper>
       <NFTText>{token.asset.name} {token.asset.tokenId ? '#' + new Amount(token.asset.tokenId).toNumber() : ''}</NFTText>
+      <NFTSymbol>{token.asset.symbol}</NFTSymbol>
     </NFTButton>
   )
 }

@@ -38,6 +38,7 @@ export const NFTButton = styled(WalletButton)`
   border: none;
   margin: 0px;
   padding: 0px;
+  overflow: hidden;
   &:last-child {
     margin-right: 0px;
   }
@@ -70,6 +71,20 @@ export const NFTText = styled.span`
   letter-spacing: 0.01em;
   color: ${(p) => p.theme.color.text01};
   margin-top: 6px;
+  max-width: 99%;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+`
+
+export const NFTSymbol = styled.span`
+  font-family: 'Poppins';
+  font-style: normal;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 20px;
+  color: ${p => p.theme.color.text03};
+  margin-top: 4px;
 `
 
 export const PinnedIcon = styled.div`

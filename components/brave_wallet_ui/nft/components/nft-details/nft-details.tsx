@@ -28,6 +28,7 @@ import {
   ErrorMessage,
   ExplorerButton,
   ExplorerIcon,
+  NftStandard,
   ProjectDetailButton,
   ProjectDetailButtonRow,
   ProjectDetailButtonSeperator,
@@ -44,6 +45,7 @@ import {
 import { isValidateUrl } from '../../../utils/string-utils'
 import { NftMultimedia } from '../nft-multimedia/nft-multimedia'
 import { MultimediaWrapper } from '../nft-content/nft-content-styles'
+import { CreateNetworkIcon } from '../../../components/shared'
 
 interface Props {
   isLoading?: boolean
@@ -91,6 +93,12 @@ export const NftDetails = ({ selectedAsset, nftMetadata, nftMetadataError, token
                 <NftMultimedia nftMetadata={nftMetadata}/>
               </MultimediaWrapper>
               <DetailColumn>
+                {selectedAsset.isErc721 &&
+                  <NftStandard>
+                    <CreateNetworkIcon network={tokenNetwork} size='small' />
+                    ERC-721
+                  </NftStandard>
+                }
                 <TokenName>
                   {nftMetadata.contractInformation.name} {
                   selectedAsset.tokenId
