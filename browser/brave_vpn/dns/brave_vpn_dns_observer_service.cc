@@ -70,7 +70,6 @@ bool IsValidDoHTemplates(const std::string& templates) {
 }
 
 std::string GetFilteredProvidersForCountry() {
-  namespace secure_dns = chrome_browser_net::secure_dns;
   // Use default hardcoded servers for current country.
   auto providers = secure_dns::ProvidersForCountry(
       secure_dns::SelectEnabledProviders(net::DohProviderEntry::GetList()),
@@ -155,7 +154,7 @@ bool BraveVpnDnsObserverService::IsDNSSecure(
   return secure || is_valid_automatic_mode || is_system_doh_enabled;
 }
 
-bool BraveVpnDnsObserverService::ShouldAllowExternalChanges() const {
+bool BraveVpnDnsObserverService::ShouldAllowDohOverride() const {
   if (allow_changes_for_testing_.has_value())
     return allow_changes_for_testing_.value();
 
@@ -167,9 +166,11 @@ bool BraveVpnDnsObserverService::ShouldAllowExternalChanges() const {
 }
 
 bool BraveVpnDnsObserverService::IsDnsModeConfiguredByPolicy() const {
+  auto policy_value = (policy_reader_)
+                          ? policy_reader_.Run(policy::key::kDnsOverHttpsMode)
+                          : absl::nullopt;
   bool doh_policy_set =
-      policy_reader_ &&
-      !policy_reader_.Run(policy::key::kDnsOverHttpsMode).empty();
+      policy_value.has_value() && !policy_value.value().empty();
   return doh_policy_set ||
          SystemNetworkContextManager::GetStubResolverConfigReader()
              ->ShouldDisableDohForManaged();
@@ -192,7 +193,7 @@ void BraveVpnDnsObserverService::ShowPolicyWarningMessage() {
       base::BindOnce(&SkipDNSDialog, profile_prefs_));
 }
 
-void BraveVpnDnsObserverService::ShowMessageWhyWeOverrideDNSSettings() {
+void BraveVpnDnsObserverService::ShowVpnNotificationDialog() {
   if (skip_notification_dialog_for_testing_)
     return;
   VpnNotificationDialogView::Show(chrome::FindLastActive());
@@ -207,7 +208,7 @@ void BraveVpnDnsObserverService::OnDNSPrefChanged() {
   if (is_dns_secure)
     return;
   // Reset saved config and keep user's choice.
-  if (!ShouldAllowExternalChanges()) {
+  if (!ShouldAllowDohOverride()) {
     ignore_prefs_change_ = true;
     const auto& saved_dns_config =
         profile_prefs_->GetDict(prefs::kBraveVPNUserConfig);
@@ -246,7 +247,7 @@ void BraveVpnDnsObserverService::UnlockDNS() {
 void BraveVpnDnsObserverService::LockDNS(const std::string& servers) {
   profile_prefs_->SetBoolean(prefs::kBraveVPNUserConfigLocked, true);
   SetDNSOverHTTPSMode(SecureDnsConfig::kModeSecure, GetDoHServers(&servers));
-  ShowMessageWhyWeOverrideDNSSettings();
+  ShowVpnNotificationDialog();
 }
 
 void BraveVpnDnsObserverService::OnConnectionStateChanged(

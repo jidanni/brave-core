@@ -37,7 +37,7 @@ class BraveVpnDnsObserverService
       public KeyedService {
  public:
   using DnsPolicyReaderCallback =
-      base::RepeatingCallback<std::string(const std::string&)>;
+      base::RepeatingCallback<absl::optional<std::string>(const std::string&)>;
 
   explicit BraveVpnDnsObserverService(PrefService* local_state,
                                       PrefService* profile_prefs,
@@ -50,8 +50,14 @@ class BraveVpnDnsObserverService
   // brave_vpn::BraveVPNServiceObserver
   void OnConnectionStateChanged(
       brave_vpn::mojom::ConnectionState state) override;
-  bool ShouldAllowExternalChanges() const;
-  void SetAllowExternalChangesForTesting(bool allow) {
+
+  // we do not overwrite the settings if user has DoH enabled, after this user
+  // can try to disable it or DoH could be disabled by third party
+  // tool/extension/program. In this cases we ask user
+  // if we have to restore old settings.
+  bool ShouldAllowDohOverride() const;
+
+  void SetAllowDohOverrideForTesting(bool allow) {
     allow_changes_for_testing_ = allow;
   }
 
@@ -81,7 +87,7 @@ class BraveVpnDnsObserverService
   void LockDNS(const std::string& servers);
   void UnlockDNS();
   void ShowPolicyWarningMessage();
-  void ShowMessageWhyWeOverrideDNSSettings();
+  void ShowVpnNotificationDialog();
 
   base::OnceClosure policy_callback_;
   DnsPolicyReaderCallback policy_reader_;

@@ -58,10 +58,7 @@ BraveVpnServiceFactory::BraveVpnServiceFactory()
   DependsOn(skus::SkusServiceFactory::GetInstance());
 
 #if BUILDFLAG(IS_WIN)
-  if (base::FeatureList::IsEnabled(
-          brave_vpn::features::kBraveVPNDnsProtection)) {
-    DependsOn(brave_vpn::BraveVpnDnsObserverFactory::GetInstance());
-  }
+  DependsOn(brave_vpn::BraveVpnDnsObserverFactory::GetInstance());
 #endif
 
 #if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)

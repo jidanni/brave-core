@@ -5,12 +5,15 @@
 
 #include "brave/browser/brave_vpn/dns/brave_vpn_dns_observer_factory.h"
 
+#include <cstddef>
 #include <memory>
 #include <string>
 #include <unordered_map>
 
+#include "base/feature_list.h"
 #include "brave/browser/brave_vpn/dns/brave_vpn_dns_observer_service.h"
 #include "brave/components/brave_vpn/brave_vpn_utils.h"
+#include "brave/components/brave_vpn/features.h"
 #include "brave/components/brave_vpn/pref_names.h"
 #include "chrome/browser/browser_process.h"
 #include "chrome/browser/policy/chrome_browser_policy_connector.h"
@@ -26,16 +29,16 @@
 namespace brave_vpn {
 
 namespace {
-std::string GetPolicyValue(const std::string& name) {
+absl::optional<std::string> GetPolicyValue(const std::string& name) {
   auto* service = g_browser_process->policy_service();
   if (!service)
-    return std::string();
+    return absl::nullopt;
   auto ns =
       policy::PolicyNamespace(policy::POLICY_DOMAIN_CHROME, std::string());
   const base::Value* mode =
       service->GetPolicies(ns).GetValue(name, base::Value::Type::STRING);
   if (!mode || !mode->is_string())
-    return std::string();
+    return absl::nullopt;
   return mode->GetString();
 }
 
@@ -62,8 +65,11 @@ KeyedService* BraveVpnDnsObserverFactory::BuildServiceInstanceFor(
 // static
 BraveVpnDnsObserverService* BraveVpnDnsObserverFactory::GetServiceForContext(
     content::BrowserContext* context) {
-  if (!IsBraveVPNEnabled())
+  if (!base::FeatureList::IsEnabled(
+          brave_vpn::features::kBraveVPNDnsProtection)) {
     return nullptr;
+  }
+  DCHECK(IsBraveVPNEnabled());
   return static_cast<BraveVpnDnsObserverService*>(
       GetInstance()->GetServiceForBrowserContext(context, true));
 }

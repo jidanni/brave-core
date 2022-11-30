@@ -426,15 +426,20 @@ constexpr char kBraveAndroidSafeBrowsingDescription[] =
      flag_descriptions::kBraveVPNName,                    \
      flag_descriptions::kBraveVPNDescription,             \
      kOsMac | kOsWin,                                     \
-     FEATURE_VALUE_TYPE(brave_vpn::features::kBraveVPN)}, \
-    {kBraveVPNDnsFeatureInternalName,                        \
+     FEATURE_VALUE_TYPE(brave_vpn::features::kBraveVPN)},
+#if BUILDFLAG(IS_WIN)
+#define BRAVE_VPN_DNS_FEATURE_ENTRIES                                  \
+    {kBraveVPNDnsFeatureInternalName,                                  \
      flag_descriptions::kBraveVPNDnsProtectionName,                    \
      flag_descriptions::kBraveVPNDnsProtectionDescription,             \
-     kOsWin,                                     \
+     kOsWin,                                                           \
      FEATURE_VALUE_TYPE(brave_vpn::features::kBraveVPNDnsProtection)},
-
+#else
+#define BRAVE_VPN_DNS_FEATURE_ENTRIES
+#endif
 #else
 #define BRAVE_VPN_FEATURE_ENTRIES
+#define BRAVE_VPN_DNS_FEATURE_ENTRIES
 #endif
 
 #define BRAVE_SKU_SDK_FEATURE_ENTRIES                   \
@@ -745,6 +750,7 @@ constexpr char kBraveAndroidSafeBrowsingDescription[] =
     CRYPTO_WALLETS_FEATURE_ENTRIES                                          \
     BRAVE_REWARDS_GEMINI_FEATURE_ENTRIES                                    \
     BRAVE_VPN_FEATURE_ENTRIES                                               \
+    BRAVE_VPN_DNS_FEATURE_ENTRIES                                           \
     BRAVE_SKU_SDK_FEATURE_ENTRIES                                           \
     SPEEDREADER_FEATURE_ENTRIES                                             \
     BRAVE_TRANSLATE_GO_FEATURE_ENTRIES                                      \

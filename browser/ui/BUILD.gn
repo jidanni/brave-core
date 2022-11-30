@@ -282,11 +282,13 @@ source_set("ui") {
       "views/window_closing_confirm_dialog_view.cc",
       "views/window_closing_confirm_dialog_view.h",
     ]
-    if (is_win) {
-      sources += [
-        "views/brave_vpn/vpn_notification_dialog_view.cc",
-        "views/brave_vpn/vpn_notification_dialog_view.h",
-      ]
+    if (enable_brave_vpn) {
+      if (is_win) {
+        sources += [
+          "views/brave_vpn/vpn_notification_dialog_view.cc",
+          "views/brave_vpn/vpn_notification_dialog_view.h",
+        ]
+      }
     }
     if (use_aura) {
       sources += [

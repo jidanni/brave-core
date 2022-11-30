@@ -73,7 +73,7 @@ class BraveVpnDnsObserverServiceUnitTest : public testing::Test {
     dns_service_->SkipNotificationDialogForTesting(true);
   }
 
-  std::string ReadDNSPolicyValue(const std::string& name) {
+  absl::optional<std::string> ReadDNSPolicyValue(const std::string& name) {
     EXPECT_TRUE(policy_map_.count(name));
     return policy_map_.at(name);
   }
@@ -129,7 +129,7 @@ class BraveVpnDnsObserverServiceUnitTest : public testing::Test {
               doh_providers);
   }
   void AllowUsersChange(bool value) {
-    dns_service_->SetAllowExternalChangesForTesting(value);
+    dns_service_->SetAllowDohOverrideForTesting(value);
   }
   void SetPolicyValue(const std::string& name, const std::string& value) {
     policy_map_[name] = value;
