@@ -155,6 +155,8 @@ void IPFSTabHelper::UpdateLocationBar() {
 GURL IPFSTabHelper::GetCurrentPageURL() const {
   if (current_page_url_for_testing_.is_valid())
     return current_page_url_for_testing_;
+  // We use GetLastCommittedURL as the current url for IPFS related checks
+  // because this checks are initiated after navigation commit.
   return web_contents()->GetLastCommittedURL();
 }
 
