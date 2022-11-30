@@ -199,58 +199,94 @@ const CryptoView = (props: Props) => {
 
   // render
   return (
-    <StyledWrapper onClick={onClickHideMore}>
-      <Switch>
-        {/* Portfolio */}
-        <Route path={WalletRoutes.AddAssetModal} exact>{/* Show portfolio overview in background */}
-          {nav}
-          <PortfolioOverview />
-        </Route>
+    <>
+      <StyledWrapper onClick={onClickHideMore}>
+        <Switch>
+          {/* Portfolio */}
+          <Route path={WalletRoutes.AddAssetModal} exact>{/* Show portfolio overview in background */}
+            {nav}
+            <PortfolioOverview />
+          </Route>
 
-        <Route path={WalletRoutes.PortfolioAsset} exact>
-          <PortfolioAsset />
-        </Route>
+          <Route path={WalletRoutes.PortfolioAsset} exact>
+            <PortfolioAsset />
+          </Route>
 
-        <Route path={WalletRoutes.Portfolio}>
-          {nav}
-          <PortfolioOverview />
-        </Route>
+          <Route path={WalletRoutes.Portfolio}>
+            {nav}
+            <PortfolioOverview />
+          </Route>
 
-        {/* Accounts */}
-        <Route path={WalletRoutes.AddAccountModal}>{/* Show accounts overview in background */}
-          {nav}
-          <Accounts />
-        </Route>
+          {/* Accounts */}
+          <Route path={WalletRoutes.AddAccountModal}>{/* Show accounts overview in background */}
+            {nav}
+            <Accounts />
+          </Route>
 
-        <Route path={WalletRoutes.Account}>
-          <Account
-            goBack={goBack}
-          />
-        </Route>
+          <Route path={WalletRoutes.Account}>
+            <Account
+              goBack={goBack}
+            />
+          </Route>
 
-        <Route path={WalletRoutes.Accounts}>
-          {nav}
-          <Accounts />
-        </Route>
+          <Route path={WalletRoutes.Accounts}>
+            {nav}
+            <Accounts />
+          </Route>
 
-        <Route path={WalletRoutes.Market} exact={true}>
-          {nav}
-          <MarketView />
-        </Route>
+          <Route path={WalletRoutes.Market} exact={true}>
+            {nav}
+            <MarketView />
+          </Route>
 
-        <Route path={WalletRoutes.MarketSub} exact={true}>
-          {nav}
-          <PortfolioAsset
-            isShowingMarketData={true}
-          />
-        </Route>
+          <Route path={WalletRoutes.MarketSub} exact={true}>
+            {nav}
+            <PortfolioAsset
+              isShowingMarketData={true}
+            />
+          </Route>
 
-        <Route path={WalletRoutes.Nfts} exact={true}>
-          {nav}
-          <NftView />
-        </Route>
+          <Route path={WalletRoutes.Nfts} exact={true}>
+            {nav}
+            <NftView />
+          </Route>
 
-        {/* NFT Pinning */}
+          <Route path={WalletRoutes.LocalIpfsNode} exact={true}>
+            <LocalIpfsNodeScreen onClose={onClose} />
+          </Route>
+
+          <Route path={WalletRoutes.InspectNfts} exact={true}>
+            <InspectNftsScreen onClose={onClose} onBack={onClose} />
+          </Route>
+
+          <Redirect to={sessionRoute || WalletRoutes.Portfolio} />
+
+        </Switch>
+
+        {/* modals */}
+        <Switch>
+          <Route path={WalletRoutes.AddAssetModal} exact>
+            <EditVisibleAssetsModal
+              onClose={hideVisibleAssetsModal}
+            />
+          </Route>
+
+          <Route path={WalletRoutes.AddAccountModal}>
+            <AddAccountModal />
+          </Route>
+        </Switch>
+
+        {accountToRemove !== undefined &&
+          <ConfirmPasswordModal />
+        }
+
+        {showAccountModal && selectedAccount &&
+          <AccountSettingsModal />
+        }
+      </StyledWrapper>
+
+      {/* NFT Pinning Full Screen pages */}
+      {/* <Switch>
         <Route path={WalletRoutes.LocalIpfsNode} exact={true}>
           <LocalIpfsNodeScreen onClose={onClose} />
         </Route>
@@ -258,32 +294,8 @@ const CryptoView = (props: Props) => {
         <Route path={WalletRoutes.InspectNfts} exact={true}>
           <InspectNftsScreen onClose={onClose} onBack={onClose} />
         </Route>
-
-        <Redirect to={sessionRoute || WalletRoutes.Portfolio} />
-
-      </Switch>
-
-      {/* modals */}
-      <Switch>
-        <Route path={WalletRoutes.AddAssetModal} exact>
-          <EditVisibleAssetsModal
-            onClose={hideVisibleAssetsModal}
-          />
-        </Route>
-
-        <Route path={WalletRoutes.AddAccountModal}>
-          <AddAccountModal />
-        </Route>
-      </Switch>
-
-      {accountToRemove !== undefined &&
-        <ConfirmPasswordModal />
-      }
-
-      {showAccountModal && selectedAccount &&
-        <AccountSettingsModal />
-      }
-    </StyledWrapper>
+      </Switch> */}
+    </>
   )
 }
 

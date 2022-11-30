@@ -7,7 +7,10 @@ import * as React from 'react'
 import { useHistory } from 'react-router'
 import { WalletRoutes } from '../../../constants/types'
 
+export type BannerStatus = 'start' | 'uploading' | 'success'
+
 interface Props {
+  status: BannerStatus
   onDismiss: () => void
 }
 
@@ -15,12 +18,14 @@ interface Props {
 import {
   StyledWrapper,
   Ipfs,
+  IpfsUploading,
+  IpfsSuccess,
   Text,
   LearnMore,
   CloseButton
 } from './nft-ipfs-banner.styles'
 
-export const NftIpfsBanner = ({ onDismiss }: Props) => {
+export const NftIpfsBanner = ({ status, onDismiss }: Props) => {
   const history = useHistory()
 
   const onLearnMore = React.useCallback(() => {
@@ -28,12 +33,24 @@ export const NftIpfsBanner = ({ onDismiss }: Props) => {
   }, [])
 
   return (
-    <StyledWrapper>
-      <Ipfs />
-      <Text>Now you can run your IPFS and be part of web 3. Your NFT data will stay online forever and cannot be tampered with.&nbsp;
-        <LearnMore onClick={onLearnMore}>Learn more</LearnMore>
+    <StyledWrapper status={status}>
+      {status === 'start' ? (
+        <Ipfs />
+      ) : status === 'uploading' ? (
+        <IpfsUploading />
+      ) : (
+        <IpfsSuccess />
+      )}
+      <Text status={status}>
+        Now you can run your IPFS and be part of web 3. Your NFT data will stay
+        online forever and cannot be tampered with.&nbsp;
+        {status === 'start' && (
+          <LearnMore onClick={onLearnMore}>Learn more</LearnMore>
+        )}
       </Text>
-      <CloseButton onClick={onDismiss}/>
+      {status !== 'uploading' && (
+        <CloseButton onClick={onDismiss} status={status} />
+      )}
     </StyledWrapper>
   )
 }

@@ -14,18 +14,17 @@ import IpfsRunning from '../../../assets/svg-icons/nft-ipfs/positive-status.svg'
 export const RunNodeWrapper = styled.div`
   display: flex;
   flex-direction: column;
-  position: relative;
-  width: 100vw;
-  position: relative;
-  left: calc(-50vw + 50%);
-  overflow-x: hidden;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   background-image: url(${Background});
   background-size: cover;
   background-repeat: no-repeat;
   padding-top: 68px;
   background-position: 0px 0px;
   margin-top: -32px;
-  margin-right: -114px;
 `
 
 export const TopRow = styled.div`
