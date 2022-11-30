@@ -125,8 +125,7 @@ class BraveVPNOSConnectionAPI
   bool needs_connect_ = false;
   bool prevent_creation_ = false;
   std::string target_vpn_entry_name_;
-  mojom::ConnectionState connection_state_ =
-      mojom::ConnectionState::DISCONNECTED;
+  mojom::ConnectionState connection_state_ = mojom::ConnectionState::UNKNOWN;
   BraveVPNConnectionInfo connection_info_;
   raw_ptr<PrefService> local_prefs_ = nullptr;
   std::unique_ptr<Hostname> hostname_;

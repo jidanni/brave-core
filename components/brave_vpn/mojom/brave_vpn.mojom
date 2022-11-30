@@ -90,6 +90,7 @@ enum ConnectionState {
   DISCONNECTING,
   CONNECT_NOT_ALLOWED,
   CONNECT_FAILED,
+  UNKNOWN,
 };
 
 enum PurchasedState {
