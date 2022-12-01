@@ -24,7 +24,6 @@
 #include "chrome/browser/ui/simple_message_box.h"
 #include "chrome/common/pref_names.h"
 #include "chrome/grit/chromium_strings.h"
-#include "components/country_codes/country_codes.h"
 #include "components/grit/brave_components_strings.h"
 #include "components/policy/policy_constants.h"
 #include "components/prefs/pref_service.h"
@@ -84,7 +83,6 @@ BraveVpnDnsObserverService::BraveVpnDnsObserverService(
   DCHECK(profile_prefs_);
   DCHECK(local_state_);
 
-  net::NetworkChangeNotifier::AddDNSObserver(this);
   pref_change_registrar_.Init(local_state);
   pref_change_registrar_.Add(
       ::prefs::kDnsOverHttpsMode,
@@ -96,34 +94,14 @@ BraveVpnDnsObserverService::BraveVpnDnsObserverService(
                           weak_ptr_factory_.GetWeakPtr()));
 }
 
-BraveVpnDnsObserverService::~BraveVpnDnsObserverService() {
-  net::NetworkChangeNotifier::RemoveDNSObserver(this);
-}
-
-void BraveVpnDnsObserverService::OnDNSChanged() {
-  // Re-create service for reading config once becasue the service keeps
-  // the callback and cannot read multiple times.
-  dns_config_service_ = net::DnsConfigService::CreateSystemService();
-  dns_config_service_->ReadConfig(
-      base::BindRepeating(&BraveVpnDnsObserverService::OnSystemDNSConfigChanged,
-                          weak_ptr_factory_.GetWeakPtr()));
-}
-
-void BraveVpnDnsObserverService::OnSystemDNSConfigChanged(
-    const net::DnsConfig& config) {
-  system_dns_config_ = config;
-  dns_config_service_.reset();
-}
+BraveVpnDnsObserverService::~BraveVpnDnsObserverService() = default;
 
 bool BraveVpnDnsObserverService::IsDNSSecure(const std::string& mode,
                                              const std::string& servers) const {
   bool secure = (mode == SecureDnsConfig::kModeSecure);
   bool is_valid_automatic_mode =
       (mode == SecureDnsConfig::kModeAutomatic) && IsValidDoHTemplates(servers);
-  bool is_system_doh_enabled =
-      (!system_dns_config_.doh_config.servers().empty() &&
-       system_dns_config_.allow_dns_over_https_upgrade);
-  return secure || is_valid_automatic_mode || is_system_doh_enabled;
+  return secure || is_valid_automatic_mode;
 }
 
 bool BraveVpnDnsObserverService::ShouldAllowDohOverride() const {

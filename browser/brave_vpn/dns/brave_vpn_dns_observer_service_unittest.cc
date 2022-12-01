@@ -31,22 +31,8 @@
 
 namespace brave_vpn {
 namespace {
-std::string GetDefaultDNSProvidersForCountry() {
-  namespace secure_dns = chrome_browser_net::secure_dns;
-  // Use default hardcoded servers for current country.
-  auto providers = secure_dns::ProvidersForCountry(
-      secure_dns::SelectEnabledProviders(net::DohProviderEntry::GetList()),
-      country_codes::GetCurrentCountryID());
-  for (const net::DohProviderEntry* entry : net::DohProviderEntry::GetList()) {
-    if (entry->provider != "Cloudflare")
-      continue;
-    net::DnsOverHttpsConfig doh_config({entry->doh_server_config});
-    return doh_config.ToString();
-  }
-  NOTREACHED() << "Should not be reached as we expect cloudflare is available "
-                  "in default list.";
-  return std::string();
-}
+const char kCloudflareDnsProviderURL[] =
+    "https://chrome.cloudflare-dns.com/dns-query";
 }  // namespace
 
 class BraveVpnDnsObserverServiceUnitTest : public testing::Test {
@@ -108,21 +94,6 @@ class BraveVpnDnsObserverServiceUnitTest : public testing::Test {
     local_state()->SetString(::prefs::kDnsOverHttpsMode, mode);
   }
 
-  void SetValidDoHSystemConfig() {
-    net::DnsConfig config;
-    config.doh_config =
-        *net::DnsOverHttpsConfig::FromString("https://example1.test");
-    config.allow_dns_over_https_upgrade = true;
-    EXPECT_TRUE(config.IsValid());
-    dns_service_->OnSystemDNSConfigChanged(config);
-  }
-
-  void DisableDoHSystemConfig() {
-    net::DnsConfig config;
-    EXPECT_FALSE(config.IsValid());
-    dns_service_->OnSystemDNSConfigChanged(config);
-  }
-
   void ExpectDNSMode(const std::string& mode,
                      const std::string& doh_providers) {
     auto dns_config = SystemNetworkContextManager::GetStubResolverConfigReader()
@@ -149,104 +120,44 @@ class BraveVpnDnsObserverServiceUnitTest : public testing::Test {
 };
 
 TEST_F(BraveVpnDnsObserverServiceUnitTest, AutoEnable) {
-  auto default_servers = GetDefaultDNSProvidersForCountry();
-  EXPECT_FALSE(default_servers.empty());
   AllowUsersChange(false);
-  // Browser DoH mode off, System DoH off
-  // -> override browser config and enable vpn
+  // Browser DoH mode off -> override browser config and enable vpn
   {
     local_state()->ClearPref(prefs::kBraveVpnDnsConfig);
     SetDNSMode(SecureDnsConfig::kModeOff, "");
     FireBraveVPNStateChange(mojom::ConnectionState::CONNECTING);
     ExpectDNSMode(SecureDnsConfig::kModeOff, "");
-    DisableDoHSystemConfig();
     FireBraveVPNStateChange(mojom::ConnectionState::CONNECTED);
-    ExpectDNSMode(SecureDnsConfig::kModeSecure, default_servers);
+    ExpectDNSMode(SecureDnsConfig::kModeSecure, kCloudflareDnsProviderURL);
     EXPECT_FALSE(local_state()->GetDict(prefs::kBraveVpnDnsConfig).empty());
     FireBraveVPNStateChange(mojom::ConnectionState::DISCONNECTING);
-    ExpectDNSMode(SecureDnsConfig::kModeSecure, default_servers);
+    ExpectDNSMode(SecureDnsConfig::kModeSecure, kCloudflareDnsProviderURL);
     FireBraveVPNStateChange(mojom::ConnectionState::DISCONNECTED);
     ExpectDNSMode(SecureDnsConfig::kModeOff, "");
     EXPECT_TRUE(local_state()->GetDict(prefs::kBraveVpnDnsConfig).empty());
   }
 
-  // Browser DoH mode off, System DoH on
-  // -> do not override browser config and enable vpn
-  {
-    local_state()->ClearPref(prefs::kBraveVpnDnsConfig);
-    SetDNSMode(SecureDnsConfig::kModeOff, "");
-    FireBraveVPNStateChange(mojom::ConnectionState::CONNECTING);
-    ExpectDNSMode(SecureDnsConfig::kModeOff, "");
-    SetValidDoHSystemConfig();
-    FireBraveVPNStateChange(mojom::ConnectionState::CONNECTED);
-    ExpectDNSMode(SecureDnsConfig::kModeOff, "");
-    EXPECT_TRUE(local_state()->GetDict(prefs::kBraveVpnDnsConfig).empty());
-    FireBraveVPNStateChange(mojom::ConnectionState::DISCONNECTING);
-    ExpectDNSMode(SecureDnsConfig::kModeOff, "");
-    FireBraveVPNStateChange(mojom::ConnectionState::DISCONNECTED);
-    ExpectDNSMode(SecureDnsConfig::kModeOff, "");
-    EXPECT_TRUE(local_state()->GetDict(prefs::kBraveVpnDnsConfig).empty());
-  }
-
-  // Browser DoH mode automatic, System DoH off
+  // Browser DoH mode automatic, servers not valid
   // -> override browser config and enable vpn
   {
     SetDNSMode(SecureDnsConfig::kModeAutomatic, "");
     FireBraveVPNStateChange(mojom::ConnectionState::CONNECTING);
     ExpectDNSMode(SecureDnsConfig::kModeAutomatic, "");
-    DisableDoHSystemConfig();
     FireBraveVPNStateChange(mojom::ConnectionState::CONNECTED);
-    ExpectDNSMode(SecureDnsConfig::kModeSecure, default_servers);
+    ExpectDNSMode(SecureDnsConfig::kModeSecure, kCloudflareDnsProviderURL);
     EXPECT_FALSE(local_state()->GetDict(prefs::kBraveVpnDnsConfig).empty());
     FireBraveVPNStateChange(mojom::ConnectionState::DISCONNECTING);
-    ExpectDNSMode(SecureDnsConfig::kModeSecure, default_servers);
+    ExpectDNSMode(SecureDnsConfig::kModeSecure, kCloudflareDnsProviderURL);
     FireBraveVPNStateChange(mojom::ConnectionState::DISCONNECTED);
     ExpectDNSMode(SecureDnsConfig::kModeAutomatic, "");
     EXPECT_TRUE(local_state()->GetDict(prefs::kBraveVpnDnsConfig).empty());
   }
 
-  // Browser DoH mode automatic, System DoH on
-  // -> do not override browser config and enable vpn
-  {
-    local_state()->ClearPref(prefs::kBraveVpnDnsConfig);
-    SetDNSMode(SecureDnsConfig::kModeAutomatic, "");
-    FireBraveVPNStateChange(mojom::ConnectionState::CONNECTING);
-    ExpectDNSMode(SecureDnsConfig::kModeAutomatic, "");
-    SetValidDoHSystemConfig();
-    FireBraveVPNStateChange(mojom::ConnectionState::CONNECTED);
-    ExpectDNSMode(SecureDnsConfig::kModeAutomatic, "");
-    EXPECT_TRUE(local_state()->GetDict(prefs::kBraveVpnDnsConfig).empty());
-    FireBraveVPNStateChange(mojom::ConnectionState::DISCONNECTING);
-    ExpectDNSMode(SecureDnsConfig::kModeAutomatic, "");
-    FireBraveVPNStateChange(mojom::ConnectionState::DISCONNECTED);
-    ExpectDNSMode(SecureDnsConfig::kModeAutomatic, "");
-    EXPECT_TRUE(local_state()->GetDict(prefs::kBraveVpnDnsConfig).empty());
-  }
-
-  // Browser DoH mode secure, System DoH off
-  // -> do not override browser config and enable vpn
+  // Browser DoH mode secure -> do not override browser config and enable vpn
   {
     SetDNSMode(SecureDnsConfig::kModeSecure, "");
     FireBraveVPNStateChange(mojom::ConnectionState::CONNECTING);
     ExpectDNSMode(SecureDnsConfig::kModeSecure, "");
-    DisableDoHSystemConfig();
-    FireBraveVPNStateChange(mojom::ConnectionState::CONNECTED);
-    ExpectDNSMode(SecureDnsConfig::kModeSecure, "");
-    EXPECT_TRUE(local_state()->GetDict(prefs::kBraveVpnDnsConfig).empty());
-    FireBraveVPNStateChange(mojom::ConnectionState::DISCONNECTING);
-    ExpectDNSMode(SecureDnsConfig::kModeSecure, "");
-    FireBraveVPNStateChange(mojom::ConnectionState::DISCONNECTED);
-    ExpectDNSMode(SecureDnsConfig::kModeSecure, "");
-    EXPECT_TRUE(local_state()->GetDict(prefs::kBraveVpnDnsConfig).empty());
-  }
-
-  // Browser DoH mode secure, System DoH on
-  // -> do not override browser config and enable vpn
-  {
-    SetDNSMode(SecureDnsConfig::kModeSecure, "");
-    FireBraveVPNStateChange(mojom::ConnectionState::CONNECTING);
-    ExpectDNSMode(SecureDnsConfig::kModeSecure, "");
-    SetValidDoHSystemConfig();
     FireBraveVPNStateChange(mojom::ConnectionState::CONNECTED);
     ExpectDNSMode(SecureDnsConfig::kModeSecure, "");
     EXPECT_TRUE(local_state()->GetDict(prefs::kBraveVpnDnsConfig).empty());
@@ -259,13 +170,13 @@ TEST_F(BraveVpnDnsObserverServiceUnitTest, AutoEnable) {
 
   std::string custom_servers =
       "https://server1.com\nhttps://server2.com/{?dns}";
-  // Browser DoH mode automatic with custom servers, System DoH on
+
+  // Browser DoH mode automatic with custom servers
   // -> do not override browser config and enable vpn
   {
     SetDNSMode(SecureDnsConfig::kModeAutomatic, custom_servers);
     FireBraveVPNStateChange(mojom::ConnectionState::CONNECTING);
     ExpectDNSMode(SecureDnsConfig::kModeAutomatic, custom_servers);
-    SetValidDoHSystemConfig();
     FireBraveVPNStateChange(mojom::ConnectionState::CONNECTED);
     ExpectDNSMode(SecureDnsConfig::kModeAutomatic, custom_servers);
     EXPECT_TRUE(local_state()->GetDict(prefs::kBraveVpnDnsConfig).empty());
@@ -276,64 +187,28 @@ TEST_F(BraveVpnDnsObserverServiceUnitTest, AutoEnable) {
     EXPECT_TRUE(local_state()->GetDict(prefs::kBraveVpnDnsConfig).empty());
   }
 
-  // Browser DoH mode automatic with custom servers, System DoH off
-  // -> do not override browser config and enable vpn
-  {
-    SetDNSMode(SecureDnsConfig::kModeAutomatic, custom_servers);
-    FireBraveVPNStateChange(mojom::ConnectionState::CONNECTING);
-    ExpectDNSMode(SecureDnsConfig::kModeAutomatic, custom_servers);
-    DisableDoHSystemConfig();
-    FireBraveVPNStateChange(mojom::ConnectionState::CONNECTED);
-    ExpectDNSMode(SecureDnsConfig::kModeAutomatic, custom_servers);
-    EXPECT_TRUE(local_state()->GetDict(prefs::kBraveVpnDnsConfig).empty());
-    FireBraveVPNStateChange(mojom::ConnectionState::DISCONNECTING);
-    ExpectDNSMode(SecureDnsConfig::kModeAutomatic, custom_servers);
-    FireBraveVPNStateChange(mojom::ConnectionState::DISCONNECTED);
-    ExpectDNSMode(SecureDnsConfig::kModeAutomatic, custom_servers);
-    EXPECT_TRUE(local_state()->GetDict(prefs::kBraveVpnDnsConfig).empty());
-  }
-
-  // Browser DoH mode automatic with broken custom servers, System DoH off
+  // Browser DoH mode automatic with broken custom servers
   // -> override browser config and enable vpn
   {
     SetDNSMode(SecureDnsConfig::kModeAutomatic, std::string());
     FireBraveVPNStateChange(mojom::ConnectionState::CONNECTING);
     ExpectDNSMode(SecureDnsConfig::kModeAutomatic, std::string());
-    DisableDoHSystemConfig();
     FireBraveVPNStateChange(mojom::ConnectionState::CONNECTED);
-    ExpectDNSMode(SecureDnsConfig::kModeSecure, default_servers);
+    ExpectDNSMode(SecureDnsConfig::kModeSecure, kCloudflareDnsProviderURL);
     EXPECT_FALSE(local_state()->GetDict(prefs::kBraveVpnDnsConfig).empty());
     FireBraveVPNStateChange(mojom::ConnectionState::DISCONNECTING);
-    ExpectDNSMode(SecureDnsConfig::kModeSecure, default_servers);
+    ExpectDNSMode(SecureDnsConfig::kModeSecure, kCloudflareDnsProviderURL);
     FireBraveVPNStateChange(mojom::ConnectionState::DISCONNECTED);
     ExpectDNSMode(SecureDnsConfig::kModeAutomatic, std::string());
     EXPECT_TRUE(local_state()->GetDict(prefs::kBraveVpnDnsConfig).empty());
   }
 
-  // Browser DoH mode secure with custom servers, System DoH on
-  // -> do not override browser config and enable vpn
-  {
-    local_state()->ClearPref(prefs::kBraveVpnDnsConfig);
-    SetDNSMode(SecureDnsConfig::kModeSecure, custom_servers);
-    FireBraveVPNStateChange(mojom::ConnectionState::CONNECTING);
-    ExpectDNSMode(SecureDnsConfig::kModeSecure, custom_servers);
-    SetValidDoHSystemConfig();
-    FireBraveVPNStateChange(mojom::ConnectionState::CONNECTED);
-    ExpectDNSMode(SecureDnsConfig::kModeSecure, custom_servers);
-    EXPECT_TRUE(local_state()->GetDict(prefs::kBraveVpnDnsConfig).empty());
-    FireBraveVPNStateChange(mojom::ConnectionState::DISCONNECTING);
-    ExpectDNSMode(SecureDnsConfig::kModeSecure, custom_servers);
-    FireBraveVPNStateChange(mojom::ConnectionState::DISCONNECTED);
-    ExpectDNSMode(SecureDnsConfig::kModeSecure, custom_servers);
-    EXPECT_TRUE(local_state()->GetDict(prefs::kBraveVpnDnsConfig).empty());
-  }
-  // Browser DoH mode secure with custom servers, System DoH off
+  // Browser DoH mode secure with custom servers
   // -> do not override browser config and enable vpn
   {
     SetDNSMode(SecureDnsConfig::kModeSecure, custom_servers);
     FireBraveVPNStateChange(mojom::ConnectionState::CONNECTING);
     ExpectDNSMode(SecureDnsConfig::kModeSecure, custom_servers);
-    DisableDoHSystemConfig();
     FireBraveVPNStateChange(mojom::ConnectionState::CONNECTED);
     ExpectDNSMode(SecureDnsConfig::kModeSecure, custom_servers);
     EXPECT_TRUE(local_state()->GetDict(prefs::kBraveVpnDnsConfig).empty());
@@ -346,10 +221,7 @@ TEST_F(BraveVpnDnsObserverServiceUnitTest, AutoEnable) {
 }
 
 TEST_F(BraveVpnDnsObserverServiceUnitTest, AllowUsersChange) {
-  auto default_servers = GetDefaultDNSProvidersForCountry();
-  EXPECT_FALSE(default_servers.empty());
   AllowUsersChange(true);
-  SetValidDoHSystemConfig();
   {
     local_state()->ClearPref(prefs::kBraveVpnDnsConfig);
     SetDNSMode(SecureDnsConfig::kModeOff, "");
@@ -384,23 +256,20 @@ TEST_F(BraveVpnDnsObserverServiceUnitTest, AllowUsersChange) {
 }
 
 TEST_F(BraveVpnDnsObserverServiceUnitTest, DisallowUsersChange) {
-  auto default_servers = GetDefaultDNSProvidersForCountry();
-  EXPECT_FALSE(default_servers.empty());
   AllowUsersChange(false);
-  DisableDoHSystemConfig();
   {
     SetDNSMode(SecureDnsConfig::kModeOff, "");
     FireBraveVPNStateChange(mojom::ConnectionState::CONNECTING);
     ExpectDNSMode(SecureDnsConfig::kModeOff, "");
     FireBraveVPNStateChange(mojom::ConnectionState::CONNECTED);
-    ExpectDNSMode(SecureDnsConfig::kModeSecure, default_servers);
+    ExpectDNSMode(SecureDnsConfig::kModeSecure, kCloudflareDnsProviderURL);
 
     // Someone is trying to disable DoH mode while vpn connected,
     // a user doesnt allow this.
     SetDNSMode(SecureDnsConfig::kModeOff, "");
-    ExpectDNSMode(SecureDnsConfig::kModeSecure, default_servers);
+    ExpectDNSMode(SecureDnsConfig::kModeSecure, kCloudflareDnsProviderURL);
     FireBraveVPNStateChange(mojom::ConnectionState::DISCONNECTING);
-    ExpectDNSMode(SecureDnsConfig::kModeSecure, default_servers);
+    ExpectDNSMode(SecureDnsConfig::kModeSecure, kCloudflareDnsProviderURL);
     FireBraveVPNStateChange(mojom::ConnectionState::DISCONNECTED);
     ExpectDNSMode(SecureDnsConfig::kModeOff, "");
   }
@@ -410,13 +279,13 @@ TEST_F(BraveVpnDnsObserverServiceUnitTest, DisallowUsersChange) {
     FireBraveVPNStateChange(mojom::ConnectionState::CONNECTING);
     ExpectDNSMode(SecureDnsConfig::kModeAutomatic, "");
     FireBraveVPNStateChange(mojom::ConnectionState::CONNECTED);
-    ExpectDNSMode(SecureDnsConfig::kModeSecure, default_servers);
+    ExpectDNSMode(SecureDnsConfig::kModeSecure, kCloudflareDnsProviderURL);
     // Someone is trying to set automatic DoH mode without system level DoH
     // while vpn connected, a user doesnt allow this.
     SetDNSMode(SecureDnsConfig::kModeAutomatic, "");
-    ExpectDNSMode(SecureDnsConfig::kModeSecure, default_servers);
+    ExpectDNSMode(SecureDnsConfig::kModeSecure, kCloudflareDnsProviderURL);
     FireBraveVPNStateChange(mojom::ConnectionState::DISCONNECTING);
-    ExpectDNSMode(SecureDnsConfig::kModeSecure, default_servers);
+    ExpectDNSMode(SecureDnsConfig::kModeSecure, kCloudflareDnsProviderURL);
     FireBraveVPNStateChange(mojom::ConnectionState::DISCONNECTED);
     ExpectDNSMode(SecureDnsConfig::kModeAutomatic, "");
   }
@@ -461,7 +330,6 @@ TEST_F(BraveVpnDnsObserverServiceUnitTest, DohDisabledByPolicy) {
 }
 
 TEST_F(BraveVpnDnsObserverServiceUnitTest, IsDNSSecure) {
-  DisableDoHSystemConfig();
   EXPECT_TRUE(IsDNSSecure(SecureDnsConfig::kModeSecure,
                           "https://template1 https://template2/{?dns}"));
 
@@ -474,14 +342,6 @@ TEST_F(BraveVpnDnsObserverServiceUnitTest, IsDNSSecure) {
 
   EXPECT_FALSE(IsDNSSecure(SecureDnsConfig::kModeOff,
                            "https://template1 https://template2/{?dns}"));
-
-  SetValidDoHSystemConfig();
-  EXPECT_TRUE(IsDNSSecure(SecureDnsConfig::kModeOff, std::string()));
-
-  EXPECT_TRUE(IsDNSSecure(SecureDnsConfig::kModeOff,
-                          "https://template1 https://template2/{?dns}"));
-
-  EXPECT_TRUE(IsDNSSecure(SecureDnsConfig::kModeAutomatic, std::string()));
 }
 
 }  // namespace brave_vpn
