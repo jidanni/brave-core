@@ -6,8 +6,8 @@
 #include "bat/ads/internal/segments/segment_util.h"
 
 #include "absl/types/optional.h"
-#include "bat/ads/internal/base/unittest/unittest_base.h"
-#include "bat/ads/internal/base/unittest/unittest_file_util.h"
+#include "bat/ads/internal/common/unittest/unittest_base.h"
+#include "bat/ads/internal/common/unittest/unittest_file_util.h"
 #include "bat/ads/internal/catalog/catalog_info.h"
 #include "bat/ads/internal/catalog/catalog_json_reader.h"
 #include "bat/ads/internal/deprecated/client/client_state_manager.h"

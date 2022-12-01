@@ -12,7 +12,7 @@
 #include "base/check_op.h"
 #include "base/strings/string_number_conversions.h"
 #include "base/time/time.h"
-#include "bat/ads/internal/base/logging_util.h"
+#include "bat/ads/internal/common/logging_util.h"
 #include "bat/ads/internal/browser/browser_manager.h"
 #include "bat/ads/internal/tabs/tab_info.h"
 #include "bat/ads/internal/tabs/tab_manager.h"

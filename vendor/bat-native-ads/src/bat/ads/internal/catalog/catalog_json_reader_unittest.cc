@@ -6,9 +6,9 @@
 #include "bat/ads/internal/catalog/catalog_json_reader.h"
 
 #include "base/time/time.h"
-#include "bat/ads/internal/base/unittest/unittest_base.h"
-#include "bat/ads/internal/base/unittest/unittest_file_util.h"
-#include "bat/ads/internal/base/unittest/unittest_time_util.h"
+#include "bat/ads/internal/common/unittest/unittest_base.h"
+#include "bat/ads/internal/common/unittest/unittest_file_util.h"
+#include "bat/ads/internal/common/unittest/unittest_time_util.h"
 #include "bat/ads/internal/catalog/campaign/catalog_campaign_info.h"
 #include "bat/ads/internal/catalog/campaign/catalog_daypart_info.h"
 #include "bat/ads/internal/catalog/campaign/catalog_geo_target_info.h"

@@ -23,7 +23,7 @@
 #include "bat/ads/internal/ads/promoted_content_ad.h"
 #include "bat/ads/internal/ads/search_result_ad.h"
 #include "bat/ads/internal/ads_client_helper.h"
-#include "bat/ads/internal/base/logging_util.h"
+#include "bat/ads/internal/common/logging_util.h"
 #include "bat/ads/internal/browser/browser_manager.h"
 #include "bat/ads/internal/catalog/catalog.h"
 #include "bat/ads/internal/conversions/conversion_queue_item_info.h"
