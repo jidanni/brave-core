@@ -51,6 +51,7 @@ class BraveVpnDnsObserverService
   void OnConnectionStateChanged(
       brave_vpn::mojom::ConnectionState state) override;
 
+  bool IsLocked() const;
   // we do not overwrite the settings if user has DoH enabled, after this user
   // can try to disable it or DoH could be disabled by third party
   // tool/extension/program. In this cases we ask user
@@ -78,9 +79,7 @@ class BraveVpnDnsObserverService
  private:
   friend class BraveVpnDnsObserverServiceUnitTest;
 
-  void SetDNSOverHTTPSMode(const std::string& mode,
-                           const std::string& doh_providers);
-  bool IsDNSSecure(SecureDnsConfig dns_config) const;
+  bool IsDNSSecure(const std::string& mode, const std::string& servers) const;
   void OnSystemDNSConfigChanged(const net::DnsConfig& config);
   void OnDNSPrefChanged();
   void OnDNSDialogDismissed(bool checked);
@@ -91,7 +90,7 @@ class BraveVpnDnsObserverService
 
   base::OnceClosure policy_callback_;
   DnsPolicyReaderCallback policy_reader_;
-  bool ignore_prefs_change_ = true;
+  bool is_vpn_connected_ = false;
   absl::optional<bool> allow_changes_for_testing_;
   bool skip_notification_dialog_for_testing_ = false;
   raw_ptr<PrefService> local_state_;

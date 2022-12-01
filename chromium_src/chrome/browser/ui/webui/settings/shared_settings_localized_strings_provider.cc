@@ -10,9 +10,7 @@
 #if BUILDFLAG(IS_WIN)
 #include "brave/components/brave_vpn/features.h"
 #include "brave/components/brave_vpn/pref_names.h"
-#include "chrome/browser/profiles/profile.h"
-#include "chrome/browser/ui/browser.h"
-#include "chrome/browser/ui/browser_finder.h"
+#include "chrome/browser/browser_process.h"
 #include "components/grit/brave_components_strings.h"
 #include "components/prefs/pref_service.h"
 
@@ -22,11 +20,9 @@ bool ShouldReplaceSecureDNSDisabledDescription() {
   if (!base::FeatureList::IsEnabled(
           brave_vpn::features::kBraveVPNDnsProtection))
     return false;
-  auto* browser = chrome::FindLastActive();
-  if (!browser)
-    return false;
-  return browser->profile()->GetOriginalProfile()->GetPrefs()->GetBoolean(
-      brave_vpn::prefs::kBraveVPNUserConfigLocked);
+  return !g_browser_process->local_state()
+              ->GetDict(brave_vpn::prefs::kBraveVpnDnsConfig)
+              .empty();
 }
 
 }  // namespace

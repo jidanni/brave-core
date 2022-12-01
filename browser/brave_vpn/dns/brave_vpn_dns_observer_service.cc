@@ -1,7 +1,7 @@
 /* Copyright 2022 The Brave Authors. All rights reserved.
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
- * You can obtain one at http://mozilla.org/MPL/2.0/. */
+ * You can obtain one at https://mozilla.org/MPL/2.0/. */
 
 #include "brave/browser/brave_vpn/dns/brave_vpn_dns_observer_service.h"
 
@@ -11,6 +11,7 @@
 #include "base/strings/string_split.h"
 #include "base/strings/string_util.h"
 #include "brave/browser/ui/views/brave_vpn/vpn_notification_dialog_view.h"
+#include "brave/components/brave_vpn/brave_vpn_utils.h"
 #include "brave/components/brave_vpn/pref_names.h"
 #include "chrome/browser/net/secure_dns_config.h"
 #include "chrome/browser/net/secure_dns_util.h"
@@ -38,17 +39,8 @@ namespace secure_dns = chrome_browser_net::secure_dns;
 namespace brave_vpn {
 
 namespace {
-const char kBraveVpnDnsProvider[] = "Cloudflare";
-const char kDohServersValue[] = "doh_servers";
-const char kDohModeValue[] = "mode";
-
-void SaveUserDNSConfig(PrefService* prefs, SecureDnsConfig& config) {
-  base::Value::Dict user_dns_config;
-  user_dns_config.Set(kDohModeValue,
-                      SecureDnsConfig::ModeToString(config.mode()));
-  user_dns_config.Set(kDohServersValue, config.doh_servers().ToString());
-  prefs->SetDict(prefs::kBraveVPNUserConfig, std::move(user_dns_config));
-}
+const char kCloudflareDnsProviderURL[] =
+    "https://chrome.cloudflare-dns.com/dns-query";
 
 void SkipDNSDialog(PrefService* prefs, bool checked) {
   if (!prefs)
@@ -69,26 +61,9 @@ bool IsValidDoHTemplates(const std::string& templates) {
   return false;
 }
 
-std::string GetFilteredProvidersForCountry() {
-  // Use default hardcoded servers for current country.
-  auto providers = secure_dns::ProvidersForCountry(
-      secure_dns::SelectEnabledProviders(net::DohProviderEntry::GetList()),
-      country_codes::GetCurrentCountryID());
-  for (const net::DohProviderEntry* entry : net::DohProviderEntry::GetList()) {
-    if (entry->provider != kBraveVpnDnsProvider)
-      continue;
-    net::DnsOverHttpsConfig doh_config({entry->doh_server_config});
-    return doh_config.ToString();
-  }
-  NOTREACHED() << "Should not be reached as we expect " << kBraveVpnDnsProvider
-               << " is available in the default list.";
-  return std::string("1.1.1.1");
-}
-
 std::string GetDoHServers(const std::string* user_servers) {
-  return user_servers && !user_servers->empty()
-             ? *user_servers
-             : GetFilteredProvidersForCountry();
+  return user_servers && !user_servers->empty() ? *user_servers
+                                                : kCloudflareDnsProviderURL;
 }
 
 gfx::NativeWindow GetAnchorBrowserWindow() {
@@ -140,14 +115,11 @@ void BraveVpnDnsObserverService::OnSystemDNSConfigChanged(
   dns_config_service_.reset();
 }
 
-bool BraveVpnDnsObserverService::IsDNSSecure(
-    SecureDnsConfig browser_dns_config) const {
-  bool secure = (SecureDnsConfig::ModeToString(browser_dns_config.mode()) ==
-                 SecureDnsConfig::kModeSecure);
+bool BraveVpnDnsObserverService::IsDNSSecure(const std::string& mode,
+                                             const std::string& servers) const {
+  bool secure = (mode == SecureDnsConfig::kModeSecure);
   bool is_valid_automatic_mode =
-      (SecureDnsConfig::ModeToString(browser_dns_config.mode()) ==
-       SecureDnsConfig::kModeAutomatic) &&
-      IsValidDoHTemplates(browser_dns_config.doh_servers().ToString());
+      (mode == SecureDnsConfig::kModeAutomatic) && IsValidDoHTemplates(servers);
   bool is_system_doh_enabled =
       (!system_dns_config_.doh_config.servers().empty() &&
        system_dns_config_.allow_dns_over_https_upgrade);
@@ -200,53 +172,37 @@ void BraveVpnDnsObserverService::ShowVpnNotificationDialog() {
 }
 
 void BraveVpnDnsObserverService::OnDNSPrefChanged() {
-  if (ignore_prefs_change_)
+  if (IsLocked() || !is_vpn_connected_)
     return;
-  bool is_dns_secure =
-      IsDNSSecure(SystemNetworkContextManager::GetStubResolverConfigReader()
-                      ->GetSecureDnsConfiguration(false));
-  if (is_dns_secure)
-    return;
-  // Reset saved config and keep user's choice.
-  if (!ShouldAllowDohOverride()) {
-    ignore_prefs_change_ = true;
-    const auto& saved_dns_config =
-        profile_prefs_->GetDict(prefs::kBraveVPNUserConfig);
-    auto* servers_to_restore = saved_dns_config.FindString(kDohServersValue);
-    SetDNSOverHTTPSMode(SecureDnsConfig::kModeSecure,
-                        GetDoHServers(servers_to_restore));
-    ignore_prefs_change_ = false;
-  } else {
-    auto dns_config = SystemNetworkContextManager::GetStubResolverConfigReader()
-                          ->GetSecureDnsConfiguration(false);
-    SaveUserDNSConfig(profile_prefs_, dns_config);
-  }
-}
 
-void BraveVpnDnsObserverService::SetDNSOverHTTPSMode(
-    const std::string& mode,
-    const std::string& doh_providers) {
-  local_state_->SetString(::prefs::kDnsOverHttpsTemplates, doh_providers);
-  local_state_->SetString(::prefs::kDnsOverHttpsMode, mode);
+  auto new_mode = local_state_->GetString(::prefs::kDnsOverHttpsMode);
+  auto new_servers = local_state_->GetString(::prefs::kDnsOverHttpsTemplates);
+  if (IsDNSSecure(new_mode, new_servers))
+    return;
+  // Ask if user want to use new dns config with vpn.
+  if (!ShouldAllowDohOverride())
+    return;
+
+  brave_vpn::SetVpnDNSConfig(local_state_, new_mode, new_servers);
 }
 
 void BraveVpnDnsObserverService::UnlockDNS() {
-  profile_prefs_->SetBoolean(prefs::kBraveVPNUserConfigLocked, false);
-  const auto& saved_dns_config =
-      profile_prefs_->GetDict(prefs::kBraveVPNUserConfig);
-  if (saved_dns_config.empty())
-    return;
-  auto* mode_to_restore = saved_dns_config.FindString(kDohModeValue);
-  auto* servers_to_restore = saved_dns_config.FindString(kDohServersValue);
-  if (mode_to_restore && servers_to_restore) {
-    SetDNSOverHTTPSMode(*mode_to_restore, *servers_to_restore);
-  }
-  profile_prefs_->ClearPref(prefs::kBraveVPNUserConfig);
+  local_state_->ClearPref(prefs::kBraveVpnDnsConfig);
+  // Read DNS config to initiate update of actual state.
+  SystemNetworkContextManager::GetStubResolverConfigReader()
+      ->UpdateNetworkService(false);
+}
+
+bool BraveVpnDnsObserverService::IsLocked() const {
+  return !local_state_->GetDict(prefs::kBraveVpnDnsConfig).empty();
 }
 
 void BraveVpnDnsObserverService::LockDNS(const std::string& servers) {
-  profile_prefs_->SetBoolean(prefs::kBraveVPNUserConfigLocked, true);
-  SetDNSOverHTTPSMode(SecureDnsConfig::kModeSecure, GetDoHServers(&servers));
+  brave_vpn::SetVpnDNSConfig(local_state_, SecureDnsConfig::kModeSecure,
+                             GetDoHServers(&servers));
+  // Read DNS config to initiate update of actual state.
+  SystemNetworkContextManager::GetStubResolverConfigReader()
+      ->GetSecureDnsConfiguration(false);
   ShowVpnNotificationDialog();
 }
 
@@ -255,10 +211,9 @@ void BraveVpnDnsObserverService::OnConnectionStateChanged(
   if (state == brave_vpn::mojom::ConnectionState::CONNECTED) {
     auto dns_config = SystemNetworkContextManager::GetStubResolverConfigReader()
                           ->GetSecureDnsConfiguration(false);
-
-    SaveUserDNSConfig(profile_prefs_, dns_config);
-    if (!IsDNSSecure(SystemNetworkContextManager::GetStubResolverConfigReader()
-                         ->GetSecureDnsConfiguration(false))) {
+    auto* current_mode = SecureDnsConfig::ModeToString(dns_config.mode());
+    auto current_servers = dns_config.doh_servers().ToString();
+    if (!IsDNSSecure(current_mode, current_servers)) {
       // If DNS mode configured by policies we notify user that DNS may leak
       // via configured DNS gateway.
       if (IsDnsModeConfiguredByPolicy()) {
@@ -266,11 +221,11 @@ void BraveVpnDnsObserverService::OnConnectionStateChanged(
         return;
       }
 
-      LockDNS(dns_config.doh_servers().ToString());
+      LockDNS(current_servers);
     }
-    ignore_prefs_change_ = false;
+    is_vpn_connected_ = true;
   } else if (state == brave_vpn::mojom::ConnectionState::DISCONNECTED) {
-    ignore_prefs_change_ = true;
+    is_vpn_connected_ = false;
     UnlockDNS();
   }
 }

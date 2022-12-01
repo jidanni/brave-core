@@ -22,11 +22,15 @@
 #include "components/prefs/pref_registry_simple.h"
 #include "components/prefs/pref_service.h"
 #include "net/base/network_change_notifier.h"
+#include "third_party/abseil-cpp/absl/types/optional.h"
 
 namespace brave_vpn {
 
 namespace {
-
+#if BUILDFLAG(IS_WIN)
+const char kDohServersValue[] = "doh_servers";
+const char kDohModeValue[] = "mode";
+#endif
 void RegisterVPNLocalStatePrefs(PrefRegistrySimple* registry) {
 #if !BUILDFLAG(IS_ANDROID)
   registry->RegisterListPref(prefs::kBraveVPNRegionList);
@@ -38,6 +42,7 @@ void RegisterVPNLocalStatePrefs(PrefRegistrySimple* registry) {
   registry->RegisterDictionaryPref(prefs::kBraveVPNRootPref);
   registry->RegisterDictionaryPref(prefs::kBraveVPNSubscriberCredential);
   registry->RegisterBooleanPref(prefs::kBraveVPNLocalStateMigrated, false);
+  registry->RegisterDictionaryPref(prefs::kBraveVpnDnsConfig);
 }
 
 }  // namespace
@@ -100,8 +105,6 @@ std::string GetManageUrl(const std::string& env) {
 void RegisterProfilePrefs(user_prefs::PrefRegistrySyncable* registry) {
   registry->RegisterDictionaryPref(prefs::kBraveVPNRootPref);
   registry->RegisterBooleanPref(prefs::kBraveVPNShowButton, true);
-  registry->RegisterDictionaryPref(prefs::kBraveVPNUserConfig);
-  registry->RegisterBooleanPref(prefs::kBraveVPNUserConfigLocked, false);
   registry->RegisterBooleanPref(prefs::kBraveVPNShowNotificationDialog, true);
 #if BUILDFLAG(IS_ANDROID)
   registry->RegisterStringPref(prefs::kBraveVPNPurchaseTokenAndroid, "");
@@ -123,5 +126,39 @@ bool IsNetworkAvailable() {
          net::NetworkChangeNotifier::CONNECTION_NONE;
 }
 #endif  // !BUILDFLAG(IS_ANDROID)
+
+#if BUILDFLAG(IS_WIN)
+void SetVpnDNSConfig(PrefService* local_state,
+                     const std::string& mode,
+                     const std::string& doh_providers) {
+  base::Value::Dict dns_config;
+  dns_config.Set(kDohModeValue, mode);
+  dns_config.Set(kDohServersValue, doh_providers);
+  local_state->SetDict(prefs::kBraveVpnDnsConfig, std::move(dns_config));
+}
+
+absl::optional<std::string> GetVPNDnsConfigMode(PrefService* local_state) {
+  const auto& saved_dns_config =
+      local_state->GetDict(brave_vpn::prefs::kBraveVpnDnsConfig);
+  if (saved_dns_config.empty())
+    return absl::nullopt;
+  auto* value = saved_dns_config.FindString(kDohModeValue);
+  if (!value)
+    return absl::nullopt;
+  return *value;
+}
+
+absl::optional<std::string> GetVPNDnsConfigServers(PrefService* local_state) {
+  const auto& saved_dns_config =
+      local_state->GetDict(brave_vpn::prefs::kBraveVpnDnsConfig);
+  if (saved_dns_config.empty())
+    return absl::nullopt;
+  auto* value = saved_dns_config.FindString(kDohServersValue);
+  if (!value)
+    return absl::nullopt;
+  return *value;
+}
+
+#endif
 
 }  // namespace brave_vpn

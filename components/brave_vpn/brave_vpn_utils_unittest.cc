@@ -187,3 +187,25 @@ TEST(BraveVPNUtilsUnitTest, AlreadyMigrated) {
   EXPECT_TRUE(local_state_pref_service.HasPrefPath(
       brave_vpn::prefs::kBraveVPNLocalStateMigrated));
 }
+
+#if BUILDFLAG(IS_WIN)
+TEST(BraveVPNUtilsUnitTest, VpnDNSConfig) {
+  TestingPrefServiceSimple local_state_pref_service;
+  brave_vpn::RegisterLocalStatePrefs(local_state_pref_service.registry());
+  EXPECT_TRUE(
+      local_state_pref_service.GetDict(brave_vpn::prefs::kBraveVpnDnsConfig)
+          .empty());
+  EXPECT_FALSE(brave_vpn::GetVPNDnsConfigMode(&local_state_pref_service));
+  EXPECT_FALSE(brave_vpn::GetVPNDnsConfigServers(&local_state_pref_service));
+
+  brave_vpn::SetVpnDNSConfig(&local_state_pref_service, "secure",
+                             "https://server1");
+  EXPECT_EQ(*brave_vpn::GetVPNDnsConfigMode(&local_state_pref_service),
+            "secure");
+  EXPECT_FALSE(
+      local_state_pref_service.GetDict(brave_vpn::prefs::kBraveVpnDnsConfig)
+          .empty());
+  EXPECT_EQ(*brave_vpn::GetVPNDnsConfigServers(&local_state_pref_service),
+            "https://server1");
+}
+#endif
