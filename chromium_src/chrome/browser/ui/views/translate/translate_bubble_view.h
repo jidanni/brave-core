@@ -25,10 +25,13 @@ using BraveTranslateBubbleView = TranslateBubbleView;
 class TranslateBubbleView : public TranslateBubbleView_ChromiumImpl {
  public:
   template <class... Args>
-  TranslateBubbleView(Args&&... args)
+  explicit TranslateBubbleView(Args&&... args)
       : TranslateBubbleView_ChromiumImpl(std::forward<Args>(args)...) {
-    if (!translate::IsBraveAutoTranslateEnabled())
-      is_in_incognito_window_ = true;  // TODO
+    if (!translate::IsBraveAutoTranslateEnabled()) {
+      // Setting incognito mode disables UI elements connected to auto
+      // translate. "Never translate lang" options should still work.
+      is_in_incognito_window_ = true;
+    }
   }
 
   std::unique_ptr<views::ImageView> CreateTranslateIcon() override;

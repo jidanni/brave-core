@@ -7,7 +7,8 @@
 #define BRAVE_CHROMIUM_SRC_COMPONENTS_TRANSLATE_CORE_BROWSER_TRANSLATE_UI_DELEGATE_H_
 
 #define TranslateUIDelegate TranslateUIDelegate_ChromiumImpl
-#define ShouldShowAlwaysTranslateShortcut virtual ShouldShowAlwaysTranslateShortcut
+#define ShouldShowAlwaysTranslateShortcut \
+  virtual ShouldShowAlwaysTranslateShortcut
 #define ShouldAutoAlwaysTranslate virtual ShouldAutoAlwaysTranslate
 #include "src/components/translate/core/browser/translate_ui_delegate.h"
 #undef ShouldAutoAlwaysTranslate
@@ -16,7 +17,7 @@
 
 namespace translate {
 
-class TranslateUIDelegate : public TranslateUIDelegate_ChromiumImpl{
+class TranslateUIDelegate : public TranslateUIDelegate_ChromiumImpl {
  public:
   using TranslateUIDelegate_ChromiumImpl::TranslateUIDelegate_ChromiumImpl;
   bool ShouldShowAlwaysTranslateShortcut() const override;

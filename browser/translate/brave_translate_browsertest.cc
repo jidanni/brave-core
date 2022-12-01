@@ -325,7 +325,7 @@ class BraveTranslateBrowserNoAutoTranslateTest
 
 IN_PROC_BROWSER_TEST_F(BraveTranslateBrowserNoAutoTranslateTest,
                        NoAutoTranslate) {
-  // Before browsing: set auto translate from French to Chinese.
+  // Set auto translate from es to en.
   GetChromeTranslateClient()
       ->GetTranslatePrefs()
       ->AddLanguagePairToAlwaysTranslateList("es", "en");
@@ -334,14 +334,12 @@ IN_PROC_BROWSER_TEST_F(BraveTranslateBrowserNoAutoTranslateTest,
       browser(), embedded_test_server()->GetURL("/espanol_page.html")));
   WaitUntilLanguageDetermined();
 
-  //SetupTestScriptExpectations();
-
   auto* bubble = TranslateBubbleController::FromWebContents(
                      browser()->tab_strip_model()->GetActiveWebContents())
                      ->GetTranslateBubble();
   ASSERT_TRUE(bubble);
 
-  // Check that the we see BEFORE translation bubble.
+  // Check that the we see BEFORE translation bubble (not in-progress bubble).
   ASSERT_EQ(bubble->GetWindowTitle(),
             brave_l10n::GetLocalizedResourceUTF16String(
                 IDS_TRANSLATE_BUBBLE_BEFORE_TRANSLATE_TITLE));
