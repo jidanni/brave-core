@@ -38,7 +38,7 @@ bool UseGoogleTranslateEndpoint() {
              switches::kBraveTranslateUseGoogleEndpoint);
 }
 
-bool IsAutoTranslateEnabled() {
+bool IsBraveAutoTranslateEnabled() {
   return base::FeatureList::IsEnabled(features::kBraveEnableAutoTranslate);
 }
 

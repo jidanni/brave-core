@@ -19,7 +19,7 @@ namespace translate {
 
 bool TranslatePrefs::ShouldAutoTranslate(base::StringPiece source_language,
                                          std::string* target_language) {
-  if (!IsAutoTranslateEnabled()) {
+  if (!IsBraveAutoTranslateEnabled()) {
     return false;
   }
 

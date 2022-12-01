@@ -38,7 +38,7 @@ bool UseGoogleTranslateEndpoint();
 
 // True if automatic translation logic is enabled.
 // This include core logic and UI element.
-bool IsAutoTranslateEnabled();
+bool IsBraveAutoTranslateEnabled();
 
 }  // namespace translate
 
