@@ -92,14 +92,11 @@ KeyedService* BraveVpnServiceFactory::BuildServiceInstanceFor(
       new BraveVpnService(shared_url_loader_factory, local_state,
                           user_prefs::UserPrefs::Get(context), callback);
 #if BUILDFLAG(IS_WIN)
-  if (base::FeatureList::IsEnabled(
-          brave_vpn::features::kBraveVPNDnsProtection)) {
-    auto* dns_observer_service =
-        brave_vpn::BraveVpnDnsObserverFactory::GetInstance()
-            ->GetServiceForContext(context);
-    if (dns_observer_service)
-      dns_observer_service->Observe(vpn_service);
-  }
+  auto* dns_observer_service =
+      brave_vpn::BraveVpnDnsObserverFactory::GetInstance()
+          ->GetServiceForContext(context);
+  if (dns_observer_service)
+    dns_observer_service->Observe(vpn_service);
 #endif
   return vpn_service;
 }
