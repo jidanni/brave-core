@@ -19,6 +19,10 @@ import { NftIpfsBanner } from '../components/desktop/nft-ipfs-banner/nft-ipfs-ba
 import { LocalIpfsNodeScreen } from '../components/desktop/local-ipfs-node/local-ipfs-node'
 import { InspectNftsScreen } from '../components/desktop/inspect-nfts/inspect-nfts'
 import WalletPageStory from './wrappers/wallet-page-story-wrapper'
+import { NftDetails } from '../nft/components/nft-details/nft-details'
+import { mockNewAssetOptions } from './mock-data/mock-asset-options'
+import { mockNFTMetadata } from './mock-data/mock-nft-metadata'
+import { mockNetwork } from '../common/constants/mocks'
 
 export default {
   title: 'Wallet/Desktop/Components',
@@ -140,7 +144,7 @@ export const _NftIpfsBanner = () => {
 
   return (
     <div style={{ width: '855px' }}>
-      {showBanner && <NftIpfsBanner onDismiss={onDismiss} />}
+      {showBanner && <NftIpfsBanner onDismiss={onDismiss} status='start' />}
     </div>
   )
 }
@@ -184,4 +188,18 @@ export const _InspectNftsScreen = () => {
 
 _InspectNftsScreen.story = {
   name: 'Inspect NFTs Screen'
+}
+
+export const _NftDetails = () => {
+  return (
+    <NftDetails
+      selectedAsset={{ ...mockNewAssetOptions[2], contractAddress: '0x7b539F7Cc90De458B60c2ab52eEf504B5de6D035', isErc721: true }}
+      nftMetadata={mockNFTMetadata[0]}
+      tokenNetwork={mockNetwork}
+    />
+  )
+}
+
+_NftDetails.story = {
+  name: 'NFT Details'
 }
