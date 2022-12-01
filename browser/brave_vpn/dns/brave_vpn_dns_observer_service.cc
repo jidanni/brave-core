@@ -82,16 +82,6 @@ BraveVpnDnsObserverService::BraveVpnDnsObserverService(
       profile_prefs_(profile_prefs) {
   DCHECK(profile_prefs_);
   DCHECK(local_state_);
-
-  pref_change_registrar_.Init(local_state);
-  pref_change_registrar_.Add(
-      ::prefs::kDnsOverHttpsMode,
-      base::BindRepeating(&BraveVpnDnsObserverService::OnDNSPrefChanged,
-                          weak_ptr_factory_.GetWeakPtr()));
-  pref_change_registrar_.Add(
-      ::prefs::kDnsOverHttpsTemplates,
-      base::BindRepeating(&BraveVpnDnsObserverService::OnDNSPrefChanged,
-                          weak_ptr_factory_.GetWeakPtr()));
 }
 
 BraveVpnDnsObserverService::~BraveVpnDnsObserverService() = default;
@@ -102,17 +92,6 @@ bool BraveVpnDnsObserverService::IsDNSSecure(const std::string& mode,
   bool is_valid_automatic_mode =
       (mode == SecureDnsConfig::kModeAutomatic) && IsValidDoHTemplates(servers);
   return secure || is_valid_automatic_mode;
-}
-
-bool BraveVpnDnsObserverService::ShouldAllowDohOverride() const {
-  if (allow_changes_for_testing_.has_value())
-    return allow_changes_for_testing_.value();
-
-  return (chrome::ShowQuestionMessageBoxSync(
-              GetAnchorBrowserWindow(),
-              l10n_util::GetStringUTF16(IDS_PRODUCT_NAME),
-              l10n_util::GetStringUTF16(IDS_BRAVE_VPN_DNS_CHANGE_ALERT)) ==
-          chrome::MESSAGE_BOX_RESULT_YES);
 }
 
 bool BraveVpnDnsObserverService::IsDnsModeConfiguredByPolicy() const {
@@ -149,21 +128,6 @@ void BraveVpnDnsObserverService::ShowVpnNotificationDialog() {
   VpnNotificationDialogView::Show(chrome::FindLastActive());
 }
 
-void BraveVpnDnsObserverService::OnDNSPrefChanged() {
-  if (IsLocked() || !is_vpn_connected_)
-    return;
-
-  auto new_mode = local_state_->GetString(::prefs::kDnsOverHttpsMode);
-  auto new_servers = local_state_->GetString(::prefs::kDnsOverHttpsTemplates);
-  if (IsDNSSecure(new_mode, new_servers))
-    return;
-  // Ask if user want to use new dns config with vpn.
-  if (!ShouldAllowDohOverride())
-    return;
-
-  brave_vpn::SetVpnDNSConfig(local_state_, new_mode, new_servers);
-}
-
 void BraveVpnDnsObserverService::UnlockDNS() {
   local_state_->ClearPref(prefs::kBraveVpnDnsConfig);
   // Read DNS config to initiate update of actual state.
@@ -175,13 +139,15 @@ bool BraveVpnDnsObserverService::IsLocked() const {
   return !local_state_->GetDict(prefs::kBraveVpnDnsConfig).empty();
 }
 
-void BraveVpnDnsObserverService::LockDNS(const std::string& servers) {
-  brave_vpn::SetVpnDNSConfig(local_state_, SecureDnsConfig::kModeSecure,
-                             GetDoHServers(&servers));
+void BraveVpnDnsObserverService::LockDNS(const std::string& mode,
+                                         const std::string& servers,
+                                         bool show_notification) {
+  brave_vpn::SetVpnDNSConfig(local_state_, mode, GetDoHServers(&servers));
   // Read DNS config to initiate update of actual state.
   SystemNetworkContextManager::GetStubResolverConfigReader()
       ->GetSecureDnsConfiguration(false);
-  ShowVpnNotificationDialog();
+  if (show_notification)
+    ShowVpnNotificationDialog();
 }
 
 void BraveVpnDnsObserverService::OnConnectionStateChanged(
@@ -191,19 +157,23 @@ void BraveVpnDnsObserverService::OnConnectionStateChanged(
                           ->GetSecureDnsConfiguration(false);
     auto* current_mode = SecureDnsConfig::ModeToString(dns_config.mode());
     auto current_servers = dns_config.doh_servers().ToString();
-    if (!IsDNSSecure(current_mode, current_servers)) {
+    bool has_active_policy = IsDnsModeConfiguredByPolicy();
+    bool is_dns_secure = IsDNSSecure(current_mode, current_servers);
+    if (!is_dns_secure) {
       // If DNS mode configured by policies we notify user that DNS may leak
       // via configured DNS gateway.
-      if (IsDnsModeConfiguredByPolicy()) {
+      if (has_active_policy) {
         ShowPolicyWarningMessage();
         return;
       }
-
-      LockDNS(current_servers);
     }
-    is_vpn_connected_ = true;
+    // We lock settings all time when vpn connected but override DNS only
+    // when it is unsecure and not set by policy.
+    auto mode_to_lock = (has_active_policy || is_dns_secure)
+                            ? std::string(current_mode)
+                            : SecureDnsConfig::kModeSecure;
+    LockDNS(mode_to_lock, current_servers, !has_active_policy);
   } else if (state == brave_vpn::mojom::ConnectionState::DISCONNECTED) {
-    is_vpn_connected_ = false;
     UnlockDNS();
   }
 }

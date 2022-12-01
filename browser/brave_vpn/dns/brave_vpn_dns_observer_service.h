@@ -49,15 +49,6 @@ class BraveVpnDnsObserverService : public brave_vpn::BraveVPNServiceObserver,
       brave_vpn::mojom::ConnectionState state) override;
 
   bool IsLocked() const;
-  // we do not overwrite the settings if user has DoH enabled, after this user
-  // can try to disable it or DoH could be disabled by third party
-  // tool/extension/program. In this cases we ask user
-  // if we have to restore old settings.
-  bool ShouldAllowDohOverride() const;
-
-  void SetAllowDohOverrideForTesting(bool allow) {
-    allow_changes_for_testing_ = allow;
-  }
 
   void SetPolicyNotificationCallbackForTesting(base::OnceClosure callback) {
     policy_callback_ = std::move(callback);
@@ -77,20 +68,19 @@ class BraveVpnDnsObserverService : public brave_vpn::BraveVPNServiceObserver,
   void OnSystemDNSConfigChanged(const net::DnsConfig& config);
   void OnDNSPrefChanged();
   void OnDNSDialogDismissed(bool checked);
-  void LockDNS(const std::string& servers);
+  void LockDNS(const std::string& mode,
+               const std::string& servers,
+               bool show_notification);
   void UnlockDNS();
   void ShowPolicyWarningMessage();
   void ShowVpnNotificationDialog();
 
   base::OnceClosure policy_callback_;
   DnsPolicyReaderCallback policy_reader_;
-  bool is_vpn_connected_ = false;
-  absl::optional<bool> allow_changes_for_testing_;
   bool skip_notification_dialog_for_testing_ = false;
   raw_ptr<PrefService> local_state_;
   raw_ptr<PrefService> profile_prefs_;
   raw_ptr<PrefService> pref_service_for_testing_;
-  PrefChangeRegistrar pref_change_registrar_;
   base::WeakPtrFactory<BraveVpnDnsObserverService> weak_ptr_factory_{this};
 };
 
