@@ -13,76 +13,90 @@
 #include "services/network/public/mojom/network_service.mojom.h"
 #include "third_party/abseil-cpp/absl/types/optional.h"
 
-#if BUILDFLAG(IS_WIN) && BUILDFLAG(ENABLE_BRAVE_VPN)
-#include "brave/components/brave_vpn/brave_vpn_utils.h"
-#include "brave/components/brave_vpn/features.h"
+#if BUILDFLAG(ENABLE_BRAVE_VPN) && BUILDFLAG(IS_WIN)
 #include "brave/components/brave_vpn/pref_names.h"
 
 namespace {
 
-void dummy(bool insecure_dns_client_enabled,
-           ::net::SecureDnsMode secure_dns_mode,
-           const ::net::DnsOverHttpsConfig& dns_over_https_config,
-           bool additional_dns_types_enabled) {}
-
-net::SecureDnsMode MaybeOverrideDnsMode(net::SecureDnsMode secure_dns_mode,
-                                        PrefService* local_state) {
-  if (!base::FeatureList::IsEnabled(
-          brave_vpn::features::kBraveVPNDnsProtection)) {
-    return secure_dns_mode;
+bool ShouldOverride(PrefService* local_state,
+                    SecureDnsConfig::ManagementMode management_mode) {
+  if (management_mode != SecureDnsConfig::ManagementMode::kNoOverride) {
+    // there is already a managed policy or parental control in place
+    return false;
   }
 
-  auto value = brave_vpn::GetVPNDnsConfigMode(local_state);
-  if (!value.has_value())
-    return secure_dns_mode;
-  auto mode = SecureDnsConfig::ParseMode(value.value());
-  return mode.has_value() ? mode.value() : secure_dns_mode;
+  return !local_state->GetString(brave_vpn::prefs::kBraveVpnDnsConfig).empty();
 }
 
-net::DnsOverHttpsConfig MaybeOverrideDohConfig(
+bool MaybeOverrideDnsClientEnabled(
+    bool insecure_dns_client_enabled,
+    PrefService* local_state,
+    SecureDnsConfig::ManagementMode forced_management_mode) {
+  if (ShouldOverride(local_state, forced_management_mode)) {
+    // disable the insecure client for doh
+    return false;
+  }
+
+  return insecure_dns_client_enabled;
+}
+
+net::SecureDnsMode MaybeOverrideDnsMode(
+    net::SecureDnsMode secure_dns_mode,
+    PrefService* local_state,
+    SecureDnsConfig::ManagementMode management_mode) {
+  if (!ShouldOverride(local_state, management_mode)) {
+    return secure_dns_mode;
+  }
+  return net::SecureDnsMode::kSecure;
+}
+
+net::DnsOverHttpsConfig MaybeOverrideDnsConfig(
     net::DnsOverHttpsConfig doh_config,
-    PrefService* local_state) {
-  if (!base::FeatureList::IsEnabled(
-          brave_vpn::features::kBraveVPNDnsProtection)) {
+    PrefService* local_state,
+    SecureDnsConfig::ManagementMode management_mode) {
+  if (!ShouldOverride(local_state, management_mode)) {
     return doh_config;
   }
-
-  auto servers = brave_vpn::GetVPNDnsConfigServers(local_state);
-  if (!servers.has_value())
-    return doh_config;
-  return net::DnsOverHttpsConfig::FromStringLax(servers.value());
+  return net::DnsOverHttpsConfig::FromStringLax(
+      local_state->GetString(brave_vpn::prefs::kBraveVpnDnsConfig));
 }
 
-SecureDnsConfig::ManagementMode MaybeSetForcedManagementMode(
-    SecureDnsConfig::ManagementMode management_mode,
-    PrefService* local_state) {
-  if (!base::FeatureList::IsEnabled(
-          brave_vpn::features::kBraveVPNDnsProtection)) {
+SecureDnsConfig::ManagementMode MaybeOverrideForcedManagementMode(
+    PrefService* local_state,
+    SecureDnsConfig::ManagementMode management_mode) {
+  if (management_mode != SecureDnsConfig::ManagementMode::kNoOverride)
+    return management_mode;
+  if (!ShouldOverride(local_state, management_mode)) {
     return management_mode;
   }
-
-  auto mode = brave_vpn::GetVPNDnsConfigMode(local_state);
-  return mode.has_value() ? SecureDnsConfig::ManagementMode::kDisabledManaged
-                          : management_mode;
+  return SecureDnsConfig::ManagementMode::kDisabledManaged;
 }
 
 }  // namespace
 
-#define ConfigureStubHostResolver                                          \
-  ConfigureStubHostResolver(                                               \
-      GetInsecureStubResolverEnabled(),                                    \
-      MaybeOverrideDnsMode(secure_dns_mode, local_state_),                 \
-      MaybeOverrideDohConfig(doh_config, local_state_),                    \
-      additional_dns_query_types_enabled);                                 \
-  }                                                                        \
-  return SecureDnsConfig(                                                  \
-      MaybeOverrideDnsMode(secure_dns_mode, local_state_),                 \
-      MaybeOverrideDohConfig(doh_config, local_state_),                    \
-      MaybeSetForcedManagementMode(forced_management_mode, local_state_)); \
-  if (0) {                                                                 \
-  dummy
+#define SecureDnsConfig(SECURE_DNS_MODE, SECURE_DOH_CONFIG,   \
+                        FORCED_MANAGEMENT_MODE)               \
+  SecureDnsConfig(                                            \
+      MaybeOverrideDnsMode(SECURE_DNS_MODE, local_state_,     \
+                           FORCED_MANAGEMENT_MODE),           \
+      MaybeOverrideDnsConfig(SECURE_DOH_CONFIG, local_state_, \
+                             FORCED_MANAGEMENT_MODE),         \
+      MaybeOverrideForcedManagementMode(local_state_, FORCED_MANAGEMENT_MODE))
+
+#define ConfigureStubHostResolver(INSECURE_DNS_CLIENT_ENABLED,                 \
+                                  SECURE_DNS_MODE, DNS_OVER_HTTPS_CONFIG,      \
+                                  ADDITIONAL_DNS_TYPES_ENABLED)                \
+  ConfigureStubHostResolver(                                                   \
+      MaybeOverrideDnsClientEnabled(INSECURE_DNS_CLIENT_ENABLED, local_state_, \
+                                    forced_management_mode),                   \
+      MaybeOverrideDnsMode(SECURE_DNS_MODE, local_state_,                      \
+                           forced_management_mode),                            \
+      MaybeOverrideDnsConfig(DNS_OVER_HTTPS_CONFIG, local_state_,              \
+                             forced_management_mode),                          \
+      ADDITIONAL_DNS_TYPES_ENABLED)
 #endif
 #include "src/chrome/browser/net/stub_resolver_config_reader.cc"
-#if BUILDFLAG(IS_WIN) && BUILDFLAG(ENABLE_BRAVE_VPN)
+#if BUILDFLAG(ENABLE_BRAVE_VPN) && BUILDFLAG(IS_WIN)
 #undef ConfigureStubHostResolver
+#undef SecureDnsConfig
 #endif

@@ -64,13 +64,7 @@ class BraveVpnDnsObserverService : public brave_vpn::BraveVPNServiceObserver,
  private:
   friend class BraveVpnDnsObserverServiceUnitTest;
 
-  bool IsDNSSecure(const std::string& mode, const std::string& servers) const;
-  void OnSystemDNSConfigChanged(const net::DnsConfig& config);
-  void OnDNSPrefChanged();
-  void OnDNSDialogDismissed(bool checked);
-  void LockDNS(const std::string& mode,
-               const std::string& servers,
-               bool show_notification);
+  void LockDNS(const std::string& servers, bool show_notification);
   void UnlockDNS();
   void ShowPolicyWarningMessage();
   void ShowVpnNotificationDialog();

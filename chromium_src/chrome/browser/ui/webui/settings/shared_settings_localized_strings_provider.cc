@@ -21,7 +21,7 @@ bool ShouldReplaceSecureDNSDisabledDescription() {
           brave_vpn::features::kBraveVPNDnsProtection))
     return false;
   return !g_browser_process->local_state()
-              ->GetDict(brave_vpn::prefs::kBraveVpnDnsConfig)
+              ->GetString(brave_vpn::prefs::kBraveVpnDnsConfig)
               .empty();
 }
 

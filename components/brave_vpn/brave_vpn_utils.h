@@ -28,13 +28,6 @@ void RegisterAndroidProfilePrefs(PrefRegistrySimple* registry);
 #if !BUILDFLAG(IS_ANDROID)
 bool IsNetworkAvailable();
 #endif  // !BUILDFLAG(IS_ANDROID)
-#if BUILDFLAG(IS_WIN)
-void SetVpnDNSConfig(PrefService* local_state,
-                     const std::string& mode,
-                     const std::string& doh_providers);
-absl::optional<std::string> GetVPNDnsConfigMode(PrefService* local_state);
-absl::optional<std::string> GetVPNDnsConfigServers(PrefService* local_state);
-#endif
 }  // namespace brave_vpn
 
 #endif  // BRAVE_COMPONENTS_BRAVE_VPN_BRAVE_VPN_UTILS_H_
