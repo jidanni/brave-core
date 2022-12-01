@@ -24,7 +24,6 @@ extern const char kBackupNotificationInterval[];  // DEPRECATED
 extern const char kBackupSucceeded[];             // DEPRECATED
 extern const char kUserHasFunded[];               // DEPRECATED
 extern const char kUserHasClaimedGrant[];         // DEPRECATED
-extern const char kAddFundsNotification[];
 extern const char kNotificationStartupDelay[];
 extern const char kExternalWallets[];  // DEPRECATED
 extern const char kBadgeText[];

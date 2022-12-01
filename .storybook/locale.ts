@@ -134,7 +134,7 @@ let locale: Record<string, string> = {
   noActivity: 'No activities yet…',
   noAdsHistory: 'There is currently no Brave Ads history',
   noGrants: 'Currently no token grant is available.',
-  notEnoughTokens: 'Not enough tokens. Please',
+  notEnoughTokens: 'Not enough tokens.',
   noThankYou: 'No, thank you',
   off: 'off',
   ok: 'ok',

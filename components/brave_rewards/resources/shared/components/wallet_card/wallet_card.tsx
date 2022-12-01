@@ -14,7 +14,6 @@ import { ExternalWalletView } from './external_wallet_view'
 import { ExternalWalletAction } from './external_wallet_action'
 import { RewardsSummary, RewardsSummaryData } from './rewards_summary'
 import { PendingRewardsView } from './pending_rewards_view'
-import { PlusIcon } from './icons/plus_icon'
 import { WalletInfoIcon } from './icons/wallet_info_icon'
 import { ArrowCircleIcon } from '../icons/arrow_circle_icon'
 
@@ -57,10 +56,6 @@ export function WalletCard (props: Props) {
 
   const walletDisconnected =
     externalWallet && externalWallet.status === mojom.WalletStatus.kLoggedOut
-
-  function onAddFundsClick () {
-    props.onExternalWalletAction('add-funds')
-  }
 
   function renderBalance () {
     if (externalWallet && walletDisconnected) {
@@ -134,14 +129,6 @@ export function WalletCard (props: Props) {
             />
           </style.exchangeAmount>
         </style.earningsPanel>
-        {
-          props.showSummary && !walletDisconnected &&
-            <style.addFunds>
-              <button onClick={onAddFundsClick}>
-                <PlusIcon />{getString('walletAddFunds')}
-              </button>
-            </style.addFunds>
-        }
         {
           props.showSummary && props.onViewStatement &&
             <style.viewStatement>

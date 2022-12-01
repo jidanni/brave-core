@@ -331,9 +331,6 @@ class RewardsServiceImpl : public RewardsService,
   void SetLedgerStateTargetVersionForTesting(int version);
   void PrepareLedgerEnvForTesting();
   void StartMonthlyContributionForTest();
-  void MaybeShowNotificationAddFundsForTesting(
-      base::OnceCallback<void(bool)> callback);
-  void CheckInsufficientFundsForTesting();
   void ForTestingSetTestResponseCallback(
       const GetTestResponseCallback& callback);
   void StartProcessForTesting(base::OnceClosure callback);
@@ -383,8 +380,6 @@ class RewardsServiceImpl : public RewardsService,
 
   void OnRecurringTip(const ledger::mojom::Result result);
 
-  void MaybeShowAddFundsNotification(uint64_t reconcile_stamp);
-
   void OnURLLoaderComplete(SimpleURLLoaderList::iterator url_loader_it,
                            ledger::client::LoadURLCallback callback,
                            std::unique_ptr<std::string> response_body);
@@ -392,14 +387,6 @@ class RewardsServiceImpl : public RewardsService,
   void StartNotificationTimers();
   void StopNotificationTimers();
   void OnNotificationTimerFired();
-
-  void MaybeShowNotificationAddFunds();
-  bool ShouldShowNotificationAddFunds() const;
-  void ShowNotificationAddFunds(bool sufficient);
-
-  void OnMaybeShowNotificationAddFundsForTesting(
-      base::OnceCallback<void(bool)> callback,
-      const bool result);
 
   void MaybeShowNotificationTipsPaid();
   void ShowNotificationTipsPaid(bool ac_enabled);

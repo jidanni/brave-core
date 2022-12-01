@@ -1368,12 +1368,6 @@
                   "status": {
                     "type": "any"
                   },
-                  "addUrl": {
-                    "type": "any"
-                  },
-                  "withdrawUrl": {
-                    "type": "any"
-                  },
                   "userName": {
                     "type": "any"
                   },

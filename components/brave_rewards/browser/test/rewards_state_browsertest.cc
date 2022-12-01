@@ -436,7 +436,6 @@ INSTANTIATE_TEST_SUITE_P(
         std::make_pair(  // NOT_CONNECTED_token_empty_address_empty__NOT_CONNECTED_token_empty_address_empty
             std::string{
                 R"({"account_url":"",)"
-                R"("add_url":"",)"
                 R"("address":"",)"
                 R"("code_verifier":"",)"
                 R"("fees":{},)"
@@ -445,12 +444,10 @@ INSTANTIATE_TEST_SUITE_P(
                 R"("one_time_string":"49E52DEFFC7C3309C8BF807FB8E838911362837961464845DCF1E58B50886D3C",)"
                 R"("status":0,)"
                 R"("token":"",)"
-                R"("user_name":"",)"
-                R"("withdraw_url":""})"},
+                R"("user_name":""})"},
             std::string{
                 R"({"account_url":")" _UPHOLD_URL_ R"(/dashboard",)"
                 R"("activity_url":"",)"
-                R"("add_url":"",)"
                 R"("address":"",)"
                 R"("code_verifier":"",)"
                 R"("fees":{},)"
@@ -459,13 +456,11 @@ INSTANTIATE_TEST_SUITE_P(
                 R"("one_time_string":"49E52DEFFC7C3309C8BF807FB8E838911362837961464845DCF1E58B50886D3C",)"
                 R"("status":0,)"
                 R"("token":"",)"
-                R"("user_name":"",)"
-                R"("withdraw_url":""})"}),
+                R"("user_name":""})"}),
         // NOLINTNEXTLINE
         std::make_pair(  // NOT_CONNECTED_token_non_empty_address_empty__NOT_CONNECTED_token_empty_address_empty
             std::string{
                 R"({"account_url":"",)"
-                R"("add_url":"",)"
                 R"("address":"",)"
                 R"("code_verifier":"",)"
                 R"("fees":{},)"
@@ -474,12 +469,10 @@ INSTANTIATE_TEST_SUITE_P(
                 R"("one_time_string":"49E52DEFFC7C3309C8BF807FB8E838911362837961464845DCF1E58B50886D3C",)"
                 R"("status":0,)"
                 R"("token":"0047c2fd8f023e067354dbdb5639ee67acf77150",)"
-                R"("user_name":"",)"
-                R"("withdraw_url":""})"},
+                R"("user_name":""})"},
             std::string{
                 R"({"account_url":")" _UPHOLD_URL_ R"(/dashboard",)"
                 R"("activity_url":"",)"
-                R"("add_url":"",)"
                 R"("address":"",)"
                 R"("code_verifier":"",)"
                 R"("fees":{},)"
@@ -488,13 +481,11 @@ INSTANTIATE_TEST_SUITE_P(
                 R"("one_time_string":"49E52DEFFC7C3309C8BF807FB8E838911362837961464845DCF1E58B50886D3C",)"
                 R"("status":0,)"
                 R"("token":"",)"
-                R"("user_name":"",)"
-                R"("withdraw_url":""})"}),
+                R"("user_name":""})"}),
         // NOLINTNEXTLINE
         std::make_pair(  // NOT_CONNECTED_token_empty_address_non_empty__NOT_CONNECTED_token_empty_address_empty
             std::string{
                 R"({"account_url":"",)"
-                R"("add_url":"",)"
                 R"("address":"962df5b1-bb72-4619-a349-c8087941b795",)"
                 R"("code_verifier":"",)"
                 R"("fees":{},)"
@@ -503,12 +494,10 @@ INSTANTIATE_TEST_SUITE_P(
                 R"("one_time_string":"49E52DEFFC7C3309C8BF807FB8E838911362837961464845DCF1E58B50886D3C",)"
                 R"("status":0,)"
                 R"("token":"",)"
-                R"("user_name":"",)"
-                R"("withdraw_url":""})"},
+                R"("user_name":""})"},
             std::string{
                 R"({"account_url":")" _UPHOLD_URL_ R"(/dashboard",)"
                 R"("activity_url":"",)"
-                R"("add_url":"",)"
                 R"("address":"",)"
                 R"("code_verifier":"",)"
                 R"("fees":{},)"
@@ -517,13 +506,11 @@ INSTANTIATE_TEST_SUITE_P(
                 R"("one_time_string":"49E52DEFFC7C3309C8BF807FB8E838911362837961464845DCF1E58B50886D3C",)"
                 R"("status":0,)"
                 R"("token":"",)"
-                R"("user_name":"",)"
-                R"("withdraw_url":""})"}),
+                R"("user_name":""})"}),
         // NOLINTNEXTLINE
         std::make_pair(  // NOT_CONNECTED_token_non_empty_address_non_empty__NOT_CONNECTED_token_empty_address_empty
             std::string{
                 R"({"account_url":"",)"
-                R"("add_url":"",)"
                 R"("address":"962df5b1-bb72-4619-a349-c8087941b795",)"
                 R"("code_verifier":"",)"
                 R"("fees":{},)"
@@ -532,12 +519,10 @@ INSTANTIATE_TEST_SUITE_P(
                 R"("one_time_string":"49E52DEFFC7C3309C8BF807FB8E838911362837961464845DCF1E58B50886D3C",)"
                 R"("status":0,)"
                 R"("token":"0047c2fd8f023e067354dbdb5639ee67acf77150",)"
-                R"("user_name":"",)"
-                R"("withdraw_url":""})"},
+                R"("user_name":""})"},
             std::string{
                 R"({"account_url":")" _UPHOLD_URL_ R"(/dashboard",)"
                 R"("activity_url":"",)"
-                R"("add_url":"",)"
                 R"("address":"",)"
                 R"("code_verifier":"",)"
                 R"("fees":{},)"
@@ -546,13 +531,11 @@ INSTANTIATE_TEST_SUITE_P(
                 R"("one_time_string":"49E52DEFFC7C3309C8BF807FB8E838911362837961464845DCF1E58B50886D3C",)"
                 R"("status":0,)"
                 R"("token":"",)"
-                R"("user_name":"",)"
-                R"("withdraw_url":""})"}),
+                R"("user_name":""})"}),
         // NOLINTNEXTLINE
         std::make_pair(  // CONNECTED_token_empty_address_empty__NOT_CONNECTED_token_empty_address_empty
             std::string{
                 R"({"account_url":"",)"
-                R"("add_url":"",)"
                 R"("address":"",)"
                 R"("code_verifier":"",)"
                 R"("fees":{},)"
@@ -561,12 +544,10 @@ INSTANTIATE_TEST_SUITE_P(
                 R"("one_time_string":"49E52DEFFC7C3309C8BF807FB8E838911362837961464845DCF1E58B50886D3C",)"
                 R"("status":1,)"
                 R"("token":"",)"
-                R"("user_name":"",)"
-                R"("withdraw_url":""})"},
+                R"("user_name":""})"},
             std::string{
                 R"({"account_url":")" _UPHOLD_URL_ R"(/dashboard",)"
                 R"("activity_url":"",)"
-                R"("add_url":"",)"
                 R"("address":"",)"
                 R"("code_verifier":"",)"
                 R"("fees":{},)"
@@ -575,13 +556,11 @@ INSTANTIATE_TEST_SUITE_P(
                 R"("one_time_string":"49E52DEFFC7C3309C8BF807FB8E838911362837961464845DCF1E58B50886D3C",)"
                 R"("status":0,)"
                 R"("token":"",)"
-                R"("user_name":"",)"
-                R"("withdraw_url":""})"}),
+                R"("user_name":""})"}),
         // NOLINTNEXTLINE
         std::make_pair(  // CONNECTED_token_non_empty_address_empty__PENDING_token_empty_address_empty
             std::string{
                 R"({"account_url":"",)"
-                R"("add_url":"",)"
                 R"("address":"",)"
                 R"("code_verifier":"",)"
                 R"("fees":{},)"
@@ -590,12 +569,10 @@ INSTANTIATE_TEST_SUITE_P(
                 R"("one_time_string":"49E52DEFFC7C3309C8BF807FB8E838911362837961464845DCF1E58B50886D3C",)"
                 R"("status":1,)"
                 R"("token":"0047c2fd8f023e067354dbdb5639ee67acf77150",)"
-                R"("user_name":"",)"
-                R"("withdraw_url":""})"},
+                R"("user_name":""})"},
             std::string{
                 R"({"account_url":")" _UPHOLD_URL_ R"(/dashboard",)"
                 R"("activity_url":"",)"
-                R"("add_url":"",)"
                 R"("address":"",)"
                 R"("code_verifier":"",)"
                 R"("fees":{},)"
@@ -604,13 +581,11 @@ INSTANTIATE_TEST_SUITE_P(
                 R"("one_time_string":"49E52DEFFC7C3309C8BF807FB8E838911362837961464845DCF1E58B50886D3C",)"
                 R"("status":5,)"
                 R"("token":"0047c2fd8f023e067354dbdb5639ee67acf77150",)"
-                R"("user_name":"",)"
-                R"("withdraw_url":""})"}),
+                R"("user_name":""})"}),
         // NOLINTNEXTLINE
         std::make_pair(  // CONNECTED_token_empty_address_non_empty__NOT_CONNECTED_token_empty_address_empty
             std::string{
                 R"({"account_url":"",)"
-                R"("add_url":"",)"
                 R"("address":"962df5b1-bb72-4619-a349-c8087941b795",)"
                 R"("code_verifier":"",)"
                 R"("fees":{},)"
@@ -619,12 +594,10 @@ INSTANTIATE_TEST_SUITE_P(
                 R"("one_time_string":"49E52DEFFC7C3309C8BF807FB8E838911362837961464845DCF1E58B50886D3C",)"
                 R"("status":1,)"
                 R"("token":"",)"
-                R"("user_name":"",)"
-                R"("withdraw_url":""})"},
+                R"("user_name":""})"},
             std::string{
                 R"({"account_url":")" _UPHOLD_URL_ R"(/dashboard",)"
                 R"("activity_url":"",)"
-                R"("add_url":"",)"
                 R"("address":"",)"
                 R"("code_verifier":"",)"
                 R"("fees":{},)"
@@ -633,13 +606,11 @@ INSTANTIATE_TEST_SUITE_P(
                 R"("one_time_string":"49E52DEFFC7C3309C8BF807FB8E838911362837961464845DCF1E58B50886D3C",)"
                 R"("status":0,)"
                 R"("token":"",)"
-                R"("user_name":"",)"
-                R"("withdraw_url":""})"}),
+                R"("user_name":""})"}),
         // NOLINTNEXTLINE
         std::make_pair(  // CONNECTED_token_non_empty_address_non_empty__PENDING_token_empty_address_empty
             std::string{
                 R"({"account_url":"",)"
-                R"("add_url":"",)"
                 R"("address":"962df5b1-bb72-4619-a349-c8087941b795",)"
                 R"("code_verifier":"",)"
                 R"("fees":{},)"
@@ -648,12 +619,10 @@ INSTANTIATE_TEST_SUITE_P(
                 R"("one_time_string":"49E52DEFFC7C3309C8BF807FB8E838911362837961464845DCF1E58B50886D3C",)"
                 R"("status":1,)"
                 R"("token":"0047c2fd8f023e067354dbdb5639ee67acf77150",)"
-                R"("user_name":"",)"
-                R"("withdraw_url":""})"},
+                R"("user_name":""})"},
             std::string{
                 R"({"account_url":")" _UPHOLD_URL_ R"(/dashboard",)"
                 R"("activity_url":"",)"
-                R"("add_url":"",)"
                 R"("address":"",)"
                 R"("code_verifier":"",)"
                 R"("fees":{},)"
@@ -662,13 +631,11 @@ INSTANTIATE_TEST_SUITE_P(
                 R"("one_time_string":"49E52DEFFC7C3309C8BF807FB8E838911362837961464845DCF1E58B50886D3C",)"
                 R"("status":5,)"
                 R"("token":"0047c2fd8f023e067354dbdb5639ee67acf77150",)"
-                R"("user_name":"",)"
-                R"("withdraw_url":""})"}),
+                R"("user_name":""})"}),
         // NOLINTNEXTLINE
         std::make_pair(  // VERIFIED_token_empty_address_empty__DISCONNECTED_VERIFIED_token_empty_address_empty
             std::string{
                 R"({"account_url":"",)"
-                R"("add_url":"",)"
                 R"("address":"",)"
                 R"("code_verifier":"",)"
                 R"("fees":{},)"
@@ -677,12 +644,10 @@ INSTANTIATE_TEST_SUITE_P(
                 R"("one_time_string":"49E52DEFFC7C3309C8BF807FB8E838911362837961464845DCF1E58B50886D3C",)"
                 R"("status":2,)"
                 R"("token":"",)"
-                R"("user_name":"",)"
-                R"("withdraw_url":""})"},
+                R"("user_name":""})"},
             std::string{
                 R"({"account_url":")" _UPHOLD_URL_ R"(/dashboard",)"
                 R"("activity_url":"",)"
-                R"("add_url":"",)"
                 R"("address":"",)"
                 R"("code_verifier":"",)"
                 R"("fees":{},)"
@@ -691,13 +656,11 @@ INSTANTIATE_TEST_SUITE_P(
                 R"("one_time_string":"49E52DEFFC7C3309C8BF807FB8E838911362837961464845DCF1E58B50886D3C",)"
                 R"("status":4,)"
                 R"("token":"",)"
-                R"("user_name":"",)"
-                R"("withdraw_url":""})"}),
+                R"("user_name":""})"}),
         // NOLINTNEXTLINE
         std::make_pair(  // VERIFIED_token_non_empty_address_empty__PENDING_token_non_empty_address_empty
             std::string{
                 R"({"account_url":"",)"
-                R"("add_url":"",)"
                 R"("address":"",)"
                 R"("code_verifier":"",)"
                 R"("fees":{},)"
@@ -706,12 +669,10 @@ INSTANTIATE_TEST_SUITE_P(
                 R"("one_time_string":"49E52DEFFC7C3309C8BF807FB8E838911362837961464845DCF1E58B50886D3C",)"
                 R"("status":2,)"
                 R"("token":"0047c2fd8f023e067354dbdb5639ee67acf77150",)"
-                R"("user_name":"",)"
-                R"("withdraw_url":""})"},
+                R"("user_name":""})"},
             std::string{
                 R"({"account_url":")" _UPHOLD_URL_ R"(/dashboard",)"
                 R"("activity_url":"",)"
-                R"("add_url":"",)"
                 R"("address":"",)"
                 R"("code_verifier":"",)"
                 R"("fees":{},)"
@@ -720,13 +681,11 @@ INSTANTIATE_TEST_SUITE_P(
                 R"("one_time_string":"49E52DEFFC7C3309C8BF807FB8E838911362837961464845DCF1E58B50886D3C",)"
                 R"("status":5,)"
                 R"("token":"0047c2fd8f023e067354dbdb5639ee67acf77150",)"
-                R"("user_name":"",)"
-                R"("withdraw_url":""})"}),
+                R"("user_name":""})"}),
         // NOLINTNEXTLINE
         std::make_pair(  // VERIFIED_token_empty_address_non_empty__DISCONNECTED_VERIFIED_token_empty_address_empty
             std::string{
                 R"({"account_url":"",)"
-                R"("add_url":"",)"
                 R"("address":"962df5b1-bb72-4619-a349-c8087941b795",)"
                 R"("code_verifier":"",)"
                 R"("fees":{},)"
@@ -735,12 +694,10 @@ INSTANTIATE_TEST_SUITE_P(
                 R"("one_time_string":"49E52DEFFC7C3309C8BF807FB8E838911362837961464845DCF1E58B50886D3C",)"
                 R"("status":2,)"
                 R"("token":"",)"
-                R"("user_name":"",)"
-                R"("withdraw_url":""})"},
+                R"("user_name":""})"},
             std::string{
                 R"({"account_url":")" _UPHOLD_URL_ R"(/dashboard",)"
                 R"("activity_url":"",)"
-                R"("add_url":"",)"
                 R"("address":"",)"
                 R"("code_verifier":"",)"
                 R"("fees":{},)"
@@ -749,13 +706,11 @@ INSTANTIATE_TEST_SUITE_P(
                 R"("one_time_string":"49E52DEFFC7C3309C8BF807FB8E838911362837961464845DCF1E58B50886D3C",)"
                 R"("status":4,)"
                 R"("token":"",)"
-                R"("user_name":"",)"
-                R"("withdraw_url":""})"}),
+                R"("user_name":""})"}),
         // NOLINTNEXTLINE
         std::make_pair(  // VERIFIED_token_non_empty_address_non_empty__PENDING_token_non_empty_address_empty
             std::string{
                 R"({"account_url":"",)"
-                R"("add_url":"",)"
                 R"("address":"962df5b1-bb72-4619-a349-c8087941b795",)"
                 R"("code_verifier":"",)"
                 R"("fees":{},)"
@@ -764,12 +719,10 @@ INSTANTIATE_TEST_SUITE_P(
                 R"("one_time_string":"49E52DEFFC7C3309C8BF807FB8E838911362837961464845DCF1E58B50886D3C",)"
                 R"("status":2,)"
                 R"("token":"0047c2fd8f023e067354dbdb5639ee67acf77150",)"
-                R"("user_name":"",)"
-                R"("withdraw_url":""})"},
+                R"("user_name":""})"},
             std::string{
                 R"({"account_url":")" _UPHOLD_URL_ R"(/dashboard",)"
                 R"("activity_url":"",)"
-                R"("add_url":"",)"
                 R"("address":"",)"
                 R"("code_verifier":"",)"
                 R"("fees":{},)"
@@ -778,13 +731,11 @@ INSTANTIATE_TEST_SUITE_P(
                 R"("one_time_string":"49E52DEFFC7C3309C8BF807FB8E838911362837961464845DCF1E58B50886D3C",)"
                 R"("status":5,)"
                 R"("token":"0047c2fd8f023e067354dbdb5639ee67acf77150",)"
-                R"("user_name":"",)"
-                R"("withdraw_url":""})"}),
+                R"("user_name":""})"}),
         // NOLINTNEXTLINE
         std::make_pair(  // DISCONNECTED_NOT_VERIFIED_token_empty_address_empty__DISCONNECTED_VERIFIED_token_empty_address_empty
             std::string{
                 R"({"account_url":"",)"
-                R"("add_url":"",)"
                 R"("address":"",)"
                 R"("code_verifier":"",)"
                 R"("fees":{},)"
@@ -793,12 +744,10 @@ INSTANTIATE_TEST_SUITE_P(
                 R"("one_time_string":"49E52DEFFC7C3309C8BF807FB8E838911362837961464845DCF1E58B50886D3C",)"
                 R"("status":3,)"
                 R"("token":"",)"
-                R"("user_name":"",)"
-                R"("withdraw_url":""})"},
+                R"("user_name":""})"},
             std::string{
                 R"({"account_url":")" _UPHOLD_URL_ R"(/dashboard",)"
                 R"("activity_url":"",)"
-                R"("add_url":"",)"
                 R"("address":"",)"
                 R"("code_verifier":"",)"
                 R"("fees":{},)"
@@ -807,13 +756,11 @@ INSTANTIATE_TEST_SUITE_P(
                 R"("one_time_string":"49E52DEFFC7C3309C8BF807FB8E838911362837961464845DCF1E58B50886D3C",)"
                 R"("status":4,)"
                 R"("token":"",)"
-                R"("user_name":"",)"
-                R"("withdraw_url":""})"}),
+                R"("user_name":""})"}),
         // NOLINTNEXTLINE
         std::make_pair(  // DISCONNECTED_NOT_VERIFIED_token_non_empty_address_empty__DISCONNECTED_VERIFIED_token_empty_address_empty
             std::string{
                 R"({"account_url":"",)"
-                R"("add_url":"",)"
                 R"("address":"",)"
                 R"("code_verifier":"",)"
                 R"("fees":{},)"
@@ -822,12 +769,10 @@ INSTANTIATE_TEST_SUITE_P(
                 R"("one_time_string":"49E52DEFFC7C3309C8BF807FB8E838911362837961464845DCF1E58B50886D3C",)"
                 R"("status":3,)"
                 R"("token":"0047c2fd8f023e067354dbdb5639ee67acf77150",)"
-                R"("user_name":"",)"
-                R"("withdraw_url":""})"},
+                R"("user_name":""})"},
             std::string{
                 R"({"account_url":")" _UPHOLD_URL_ R"(/dashboard",)"
                 R"("activity_url":"",)"
-                R"("add_url":"",)"
                 R"("address":"",)"
                 R"("code_verifier":"",)"
                 R"("fees":{},)"
@@ -836,13 +781,11 @@ INSTANTIATE_TEST_SUITE_P(
                 R"("one_time_string":"49E52DEFFC7C3309C8BF807FB8E838911362837961464845DCF1E58B50886D3C",)"
                 R"("status":4,)"
                 R"("token":"",)"
-                R"("user_name":"",)"
-                R"("withdraw_url":""})"}),
+                R"("user_name":""})"}),
         // NOLINTNEXTLINE
         std::make_pair(  // DISCONNECTED_NOT_VERIFIED_token_empty_address_non_empty__DISCONNECTED_VERIFIED_token_empty_address_empty
             std::string{
                 R"({"account_url":"",)"
-                R"("add_url":"",)"
                 R"("address":"962df5b1-bb72-4619-a349-c8087941b795",)"
                 R"("code_verifier":"",)"
                 R"("fees":{},)"
@@ -851,12 +794,10 @@ INSTANTIATE_TEST_SUITE_P(
                 R"("one_time_string":"49E52DEFFC7C3309C8BF807FB8E838911362837961464845DCF1E58B50886D3C",)"
                 R"("status":3,)"
                 R"("token":"",)"
-                R"("user_name":"",)"
-                R"("withdraw_url":""})"},
+                R"("user_name":""})"},
             std::string{
                 R"({"account_url":")" _UPHOLD_URL_ R"(/dashboard",)"
                 R"("activity_url":"",)"
-                R"("add_url":"",)"
                 R"("address":"",)"
                 R"("code_verifier":"",)"
                 R"("fees":{},)"
@@ -865,13 +806,11 @@ INSTANTIATE_TEST_SUITE_P(
                 R"("one_time_string":"49E52DEFFC7C3309C8BF807FB8E838911362837961464845DCF1E58B50886D3C",)"
                 R"("status":4,)"
                 R"("token":"",)"
-                R"("user_name":"",)"
-                R"("withdraw_url":""})"}),
+                R"("user_name":""})"}),
         // NOLINTNEXTLINE
         std::make_pair(  // DISCONNECTED_NOT_VERIFIED_token_non_empty_address_non_empty__DISCONNECTED_VERIFIED_token_empty_address_empty
             std::string{
                 R"({"account_url":"",)"
-                R"("add_url":"",)"
                 R"("address":"962df5b1-bb72-4619-a349-c8087941b795",)"
                 R"("code_verifier":"",)"
                 R"("fees":{},)"
@@ -880,12 +819,10 @@ INSTANTIATE_TEST_SUITE_P(
                 R"("one_time_string":"49E52DEFFC7C3309C8BF807FB8E838911362837961464845DCF1E58B50886D3C",)"
                 R"("status":3,)"
                 R"("token":"0047c2fd8f023e067354dbdb5639ee67acf77150",)"
-                R"("user_name":"",)"
-                R"("withdraw_url":""})"},
+                R"("user_name":""})"},
             std::string{
                 R"({"account_url":")" _UPHOLD_URL_ R"(/dashboard",)"
                 R"("activity_url":"",)"
-                R"("add_url":"",)"
                 R"("address":"",)"
                 R"("code_verifier":"",)"
                 R"("fees":{},)"
@@ -894,13 +831,11 @@ INSTANTIATE_TEST_SUITE_P(
                 R"("one_time_string":"49E52DEFFC7C3309C8BF807FB8E838911362837961464845DCF1E58B50886D3C",)"
                 R"("status":4,)"
                 R"("token":"",)"
-                R"("user_name":"",)"
-                R"("withdraw_url":""})"}),
+                R"("user_name":""})"}),
         // NOLINTNEXTLINE
         std::make_pair(  // DISCONNECTED_VERIFIED_token_empty_address_empty__DISCONNECTED_VERIFIED_token_empty_address_empty
             std::string{
                 R"({"account_url":"",)"
-                R"("add_url":"",)"
                 R"("address":"",)"
                 R"("code_verifier":"",)"
                 R"("fees":{},)"
@@ -909,12 +844,10 @@ INSTANTIATE_TEST_SUITE_P(
                 R"("one_time_string":"49E52DEFFC7C3309C8BF807FB8E838911362837961464845DCF1E58B50886D3C",)"
                 R"("status":4,)"
                 R"("token":"",)"
-                R"("user_name":"",)"
-                R"("withdraw_url":""})"},
+                R"("user_name":""})"},
             std::string{
                 R"({"account_url":")" _UPHOLD_URL_ R"(/dashboard",)"
                 R"("activity_url":"",)"
-                R"("add_url":"",)"
                 R"("address":"",)"
                 R"("code_verifier":"",)"
                 R"("fees":{},)"
@@ -923,13 +856,11 @@ INSTANTIATE_TEST_SUITE_P(
                 R"("one_time_string":"49E52DEFFC7C3309C8BF807FB8E838911362837961464845DCF1E58B50886D3C",)"
                 R"("status":4,)"
                 R"("token":"",)"
-                R"("user_name":"",)"
-                R"("withdraw_url":""})"}),
+                R"("user_name":""})"}),
         // NOLINTNEXTLINE
         std::make_pair(  // DISCONNECTED_VERIFIED_token_non_empty_address_empty__DISCONNECTED_VERIFIED_token_empty_address_empty
             std::string{
                 R"({"account_url":"",)"
-                R"("add_url":"",)"
                 R"("address":"",)"
                 R"("code_verifier":"",)"
                 R"("fees":{},)"
@@ -938,12 +869,10 @@ INSTANTIATE_TEST_SUITE_P(
                 R"("one_time_string":"49E52DEFFC7C3309C8BF807FB8E838911362837961464845DCF1E58B50886D3C",)"
                 R"("status":4,)"
                 R"("token":"0047c2fd8f023e067354dbdb5639ee67acf77150",)"
-                R"("user_name":"",)"
-                R"("withdraw_url":""})"},
+                R"("user_name":""})"},
             std::string{
                 R"({"account_url":")" _UPHOLD_URL_ R"(/dashboard",)"
                 R"("activity_url":"",)"
-                R"("add_url":"",)"
                 R"("address":"",)"
                 R"("code_verifier":"",)"
                 R"("fees":{},)"
@@ -952,13 +881,11 @@ INSTANTIATE_TEST_SUITE_P(
                 R"("one_time_string":"49E52DEFFC7C3309C8BF807FB8E838911362837961464845DCF1E58B50886D3C",)"
                 R"("status":4,)"
                 R"("token":"",)"
-                R"("user_name":"",)"
-                R"("withdraw_url":""})"}),
+                R"("user_name":""})"}),
         // NOLINTNEXTLINE
         std::make_pair(  // DISCONNECTED_VERIFIED_token_empty_address_non_empty__DISCONNECTED_VERIFIED_token_empty_address_empty
             std::string{
                 R"({"account_url":"",)"
-                R"("add_url":"",)"
                 R"("address":"962df5b1-bb72-4619-a349-c8087941b795",)"
                 R"("code_verifier":"",)"
                 R"("fees":{},)"
@@ -967,12 +894,10 @@ INSTANTIATE_TEST_SUITE_P(
                 R"("one_time_string":"49E52DEFFC7C3309C8BF807FB8E838911362837961464845DCF1E58B50886D3C",)"
                 R"("status":4,)"
                 R"("token":"",)"
-                R"("user_name":"",)"
-                R"("withdraw_url":""})"},
+                R"("user_name":""})"},
             std::string{
                 R"({"account_url":")" _UPHOLD_URL_ R"(/dashboard",)"
                 R"("activity_url":"",)"
-                R"("add_url":"",)"
                 R"("address":"",)"
                 R"("code_verifier":"",)"
                 R"("fees":{},)"
@@ -981,13 +906,11 @@ INSTANTIATE_TEST_SUITE_P(
                 R"("one_time_string":"49E52DEFFC7C3309C8BF807FB8E838911362837961464845DCF1E58B50886D3C",)"
                 R"("status":4,)"
                 R"("token":"",)"
-                R"("user_name":"",)"
-                R"("withdraw_url":""})"}),
+                R"("user_name":""})"}),
         // NOLINTNEXTLINE
         std::make_pair(  // DISCONNECTED_VERIFIED_token_non_empty_address_non_empty__DISCONNECTED_VERIFIED_token_empty_address_empty
             std::string{
                 R"({"account_url":"",)"
-                R"("add_url":"",)"
                 R"("address":"962df5b1-bb72-4619-a349-c8087941b795",)"
                 R"("code_verifier":"",)"
                 R"("fees":{},)"
@@ -996,12 +919,10 @@ INSTANTIATE_TEST_SUITE_P(
                 R"("one_time_string":"49E52DEFFC7C3309C8BF807FB8E838911362837961464845DCF1E58B50886D3C",)"
                 R"("status":4,)"
                 R"("token":"0047c2fd8f023e067354dbdb5639ee67acf77150",)"
-                R"("user_name":"",)"
-                R"("withdraw_url":""})"},
+                R"("user_name":""})"},
             std::string{
                 R"({"account_url":")" _UPHOLD_URL_ R"(/dashboard",)"
                 R"("activity_url":"",)"
-                R"("add_url":"",)"
                 R"("address":"",)"
                 R"("code_verifier":"",)"
                 R"("fees":{},)"
@@ -1010,13 +931,11 @@ INSTANTIATE_TEST_SUITE_P(
                 R"("one_time_string":"49E52DEFFC7C3309C8BF807FB8E838911362837961464845DCF1E58B50886D3C",)"
                 R"("status":4,)"
                 R"("token":"",)"
-                R"("user_name":"",)"
-                R"("withdraw_url":""})"}),
+                R"("user_name":""})"}),
         // NOLINTNEXTLINE
         std::make_pair(  // PENDING_token_empty_address_empty__NOT_CONNECTED_token_empty_address_empty
             std::string{
                 R"({"account_url":"",)"
-                R"("add_url":"",)"
                 R"("address":"",)"
                 R"("code_verifier":"",)"
                 R"("fees":{},)"
@@ -1025,12 +944,10 @@ INSTANTIATE_TEST_SUITE_P(
                 R"("one_time_string":"49E52DEFFC7C3309C8BF807FB8E838911362837961464845DCF1E58B50886D3C",)"
                 R"("status":5,)"
                 R"("token":"",)"
-                R"("user_name":"",)"
-                R"("withdraw_url":""})"},
+                R"("user_name":""})"},
             std::string{
                 R"({"account_url":")" _UPHOLD_URL_ R"(/dashboard",)"
                 R"("activity_url":"",)"
-                R"("add_url":"",)"
                 R"("address":"",)"
                 R"("code_verifier":"",)"
                 R"("fees":{},)"
@@ -1039,13 +956,11 @@ INSTANTIATE_TEST_SUITE_P(
                 R"("one_time_string":"49E52DEFFC7C3309C8BF807FB8E838911362837961464845DCF1E58B50886D3C",)"
                 R"("status":0,)"
                 R"("token":"",)"
-                R"("user_name":"",)"
-                R"("withdraw_url":""})"}),
+                R"("user_name":""})"}),
         // NOLINTNEXTLINE
         std::make_pair(  // PENDING_token_non_empty_address_empty__PENDING_token_non_empty_address_empty
             std::string{
                 R"({"account_url":"",)"
-                R"("add_url":"",)"
                 R"("address":"",)"
                 R"("code_verifier":"",)"
                 R"("fees":{},)"
@@ -1054,12 +969,10 @@ INSTANTIATE_TEST_SUITE_P(
                 R"("one_time_string":"49E52DEFFC7C3309C8BF807FB8E838911362837961464845DCF1E58B50886D3C",)"
                 R"("status":5,)"
                 R"("token":"0047c2fd8f023e067354dbdb5639ee67acf77150",)"
-                R"("user_name":"",)"
-                R"("withdraw_url":""})"},
+                R"("user_name":""})"},
             std::string{
                 R"({"account_url":")" _UPHOLD_URL_ R"(/dashboard",)"
                 R"("activity_url":"",)"
-                R"("add_url":"",)"
                 R"("address":"",)"
                 R"("code_verifier":"",)"
                 R"("fees":{},)"
@@ -1068,13 +981,11 @@ INSTANTIATE_TEST_SUITE_P(
                 R"("one_time_string":"49E52DEFFC7C3309C8BF807FB8E838911362837961464845DCF1E58B50886D3C",)"
                 R"("status":5,)"
                 R"("token":"0047c2fd8f023e067354dbdb5639ee67acf77150",)"
-                R"("user_name":"",)"
-                R"("withdraw_url":""})"}),
+                R"("user_name":""})"}),
         // NOLINTNEXTLINE
         std::make_pair(  // PENDING_token_empty_address_non_empty__NOT_CONNECTED_token_empty_address_empty
             std::string{
                 R"({"account_url":"",)"
-                R"("add_url":"",)"
                 R"("address":"962df5b1-bb72-4619-a349-c8087941b795",)"
                 R"("code_verifier":"",)"
                 R"("fees":{},)"
@@ -1083,12 +994,10 @@ INSTANTIATE_TEST_SUITE_P(
                 R"("one_time_string":"49E52DEFFC7C3309C8BF807FB8E838911362837961464845DCF1E58B50886D3C",)"
                 R"("status":5,)"
                 R"("token":"",)"
-                R"("user_name":"",)"
-                R"("withdraw_url":""})"},
+                R"("user_name":""})"},
             std::string{
                 R"({"account_url":")" _UPHOLD_URL_ R"(/dashboard",)"
                 R"("activity_url":"",)"
-                R"("add_url":"",)"
                 R"("address":"",)"
                 R"("code_verifier":"",)"
                 R"("fees":{},)"
@@ -1097,13 +1006,11 @@ INSTANTIATE_TEST_SUITE_P(
                 R"("one_time_string":"49E52DEFFC7C3309C8BF807FB8E838911362837961464845DCF1E58B50886D3C",)"
                 R"("status":0,)"
                 R"("token":"",)"
-                R"("user_name":"",)"
-                R"("withdraw_url":""})"}),
+                R"("user_name":""})"}),
         // NOLINTNEXTLINE
         std::make_pair(  // PENDING_token_non_empty_address_non_empty__PENDING_token_non_empty_address_empty
             std::string{
                 R"({"account_url":"",)"
-                R"("add_url":"",)"
                 R"("address":"962df5b1-bb72-4619-a349-c8087941b795",)"
                 R"("code_verifier":"",)"
                 R"("fees":{},)"
@@ -1112,12 +1019,10 @@ INSTANTIATE_TEST_SUITE_P(
                 R"("one_time_string":"49E52DEFFC7C3309C8BF807FB8E838911362837961464845DCF1E58B50886D3C",)"
                 R"("status":5,)"
                 R"("token":"0047c2fd8f023e067354dbdb5639ee67acf77150",)"
-                R"("user_name":"",)"
-                R"("withdraw_url":""})"},
+                R"("user_name":""})"},
             std::string{
                 R"({"account_url":")" _UPHOLD_URL_ R"(/dashboard",)"
                 R"("activity_url":"",)"
-                R"("add_url":"",)"
                 R"("address":"",)"
                 R"("code_verifier":"",)"
                 R"("fees":{},)"
@@ -1126,8 +1031,7 @@ INSTANTIATE_TEST_SUITE_P(
                 R"("one_time_string":"49E52DEFFC7C3309C8BF807FB8E838911362837961464845DCF1E58B50886D3C",)"
                 R"("status":5,)"
                 R"("token":"0047c2fd8f023e067354dbdb5639ee67acf77150",)"
-                R"("user_name":"",)"
-                R"("withdraw_url":""})"})),
+                R"("user_name":""})"})),
     V10::NameSuffixGenerator);
 // clang-format on
 
@@ -1177,9 +1081,7 @@ INSTANTIATE_TEST_SUITE_P(
           "address": "address",
           "one_time_string": "",
           "code_verifier": "",
-          "activity_url": "activity_url",
-          "add_url": "add_url",
-          "withdraw_url": "withdraw_url"
+          "activity_url": "activity_url"
         }
       )",
       ledger::mojom::WalletStatus::kNotConnected
@@ -1193,9 +1095,7 @@ INSTANTIATE_TEST_SUITE_P(
           "address": "address",
           "one_time_string": "",
           "code_verifier": "",
-          "activity_url": "",
-          "add_url": "",
-          "withdraw_url": ""
+          "activity_url": ""
         }
       )",
       ledger::mojom::WalletStatus::kConnected
@@ -1209,9 +1109,7 @@ INSTANTIATE_TEST_SUITE_P(
           "address": "address",
           "one_time_string": "",
           "code_verifier": "",
-          "activity_url": "activity_url",
-          "add_url": "add_url",
-          "withdraw_url": "withdraw_url"
+          "activity_url": "activity_url"
         }
       )",
       ledger::mojom::WalletStatus::kLoggedOut
@@ -1225,9 +1123,7 @@ INSTANTIATE_TEST_SUITE_P(
           "address": "address",
           "one_time_string": "",
           "code_verifier": "",
-          "activity_url": "activity_url",
-          "add_url": "add_url",
-          "withdraw_url": "withdraw_url"
+          "activity_url": "activity_url"
         }
       )",
       ledger::mojom::WalletStatus::kLoggedOut
@@ -1241,9 +1137,7 @@ INSTANTIATE_TEST_SUITE_P(
           "address": "address",
           "one_time_string": "",
           "code_verifier": "",
-          "activity_url": "activity_url",
-          "add_url": "add_url",
-          "withdraw_url": "withdraw_url"
+          "activity_url": "activity_url"
         }
       )",
       ledger::mojom::WalletStatus::kNotConnected
@@ -1257,9 +1151,7 @@ INSTANTIATE_TEST_SUITE_P(
           "address": "address",
           "one_time_string": "",
           "code_verifier": "",
-          "activity_url": "activity_url",
-          "add_url": "add_url",
-          "withdraw_url": "withdraw_url"
+          "activity_url": "activity_url"
         }
       )",
       ledger::mojom::WalletStatus::kNotConnected
@@ -1273,9 +1165,7 @@ INSTANTIATE_TEST_SUITE_P(
           "address": "address",
           "one_time_string": "",
           "code_verifier": "",
-          "activity_url": "activity_url",
-          "add_url": "add_url",
-          "withdraw_url": "withdraw_url"
+          "activity_url": "activity_url"
         }
       )",
       ledger::mojom::WalletStatus::kNotConnected
@@ -1318,12 +1208,10 @@ IN_PROC_BROWSER_TEST_P_(V12, Paths) {
   const auto* one_time_string = wallet_dict.FindString("one_time_string");
   const auto* code_verifier = wallet_dict.FindString("code_verifier");
   const auto* activity_url = wallet_dict.FindString("activity_url");
-  const auto* add_url = wallet_dict.FindString("add_url");
   const auto* login_url = wallet_dict.FindString("login_url");
-  const auto* withdraw_url = wallet_dict.FindString("withdraw_url");
 
   ASSERT_TRUE(status && token && address && one_time_string && code_verifier &&
-              activity_url && add_url && login_url && withdraw_url);
+              activity_url && login_url);
 
   ASSERT_TRUE(
       (std::set{0 /* kNotConnected */, 2 /* kConnected */, 4 /* kLoggedOut */}
@@ -1336,15 +1224,11 @@ IN_PROC_BROWSER_TEST_P_(V12, Paths) {
     ASSERT_TRUE(address->empty());
 
     ASSERT_TRUE(activity_url->empty());
-    ASSERT_TRUE(add_url->empty());
-    ASSERT_TRUE(withdraw_url->empty());
   } else {  // *status == 2 /* kConnected */
     ASSERT_FALSE(token->empty());
     ASSERT_FALSE(address->empty());
 
     ASSERT_FALSE(activity_url->empty());
-    ASSERT_FALSE(add_url->empty());
-    ASSERT_FALSE(withdraw_url->empty());
   }
 
   ASSERT_FALSE(one_time_string->empty());

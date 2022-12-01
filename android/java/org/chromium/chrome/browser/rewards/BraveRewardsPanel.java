@@ -180,7 +180,6 @@ public class BraveRewardsPanel
     private LinearLayout mBtnSummary;
     private ImageView mImgSummary;
     private TextView mTextSummary;
-    private TextView mBtnAddFunds;
     private SwitchCompat mSwitchAutoContribute;
 
     private Timer mBalanceUpdater;
@@ -317,12 +316,6 @@ public class BraveRewardsPanel
             mActivity.startActivityForResult(intent, BraveConstants.SITE_BANNER_REQUEST_CODE);
         });
 
-        mBtnAddFunds = mPopupView.findViewById(R.id.btn_add_funds);
-        mBtnAddFunds.setOnClickListener(view -> {
-            dismiss();
-            mBraveActivity.openNewOrSelectExistingTab(mExternalWallet.getAddUrl());
-        });
-
         mBtnTip = mPopupView.findViewById(R.id.tip_btn);
         mImgTip = mPopupView.findViewById(R.id.tip_img);
         mTextTip = mPopupView.findViewById(R.id.tip_text);
@@ -442,7 +435,6 @@ public class BraveRewardsPanel
                 break;
             case BraveRewardsNativeWorker.REWARDS_NOTIFICATION_GRANT:
             case BraveRewardsNativeWorker.REWARDS_NOTIFICATION_GRANT_ADS:
-            case BraveRewardsNativeWorker.REWARDS_NOTIFICATION_INSUFFICIENT_FUNDS:
             case BraveRewardsNativeWorker.REWARDS_NOTIFICATION_TIPS_PROCESSED:
             case BraveRewardsNativeWorker.REWARDS_NOTIFICATION_ADS_ONBOARDING:
             case REWARDS_NOTIFICATION_NO_INTERNET:
@@ -521,12 +513,6 @@ public class BraveRewardsPanel
                                         R.string.brave_ui_rewards_contribute_description),
                                 valueString);
                         break;
-                    case AUTO_CONTRIBUTE_NOT_ENOUGH_FUNDS:
-                        title = "";
-                        notificationIcon = R.drawable.ic_error_notification;
-                        description = mPopupView.getResources().getString(
-                                R.string.brave_ui_notification_desc_no_funds);
-                        break;
                     case AUTO_CONTRIBUTE_TIPPING_ERROR:
                         title = "";
                         notificationIcon = R.drawable.ic_error_notification;
@@ -560,14 +546,6 @@ public class BraveRewardsPanel
                                 mPopupView.getResources().getString(R.string.brave_ui_new_grant),
                                 mPopupView.getResources().getString(R.string.token))
                         : mPopupView.getResources().getString(R.string.brave_ads_you_earned);
-                break;
-            case BraveRewardsNativeWorker.REWARDS_NOTIFICATION_INSUFFICIENT_FUNDS:
-                actionNotificationButton.setText(mPopupView.getResources().getString(R.string.ok));
-                notificationIcon = R.drawable.ic_info_rewards;
-                title = mPopupView.getResources().getString(
-                        R.string.brave_ui_insufficient_funds_msg);
-                description = mPopupView.getResources().getString(
-                        R.string.brave_ui_insufficient_funds_desc);
                 break;
             case BraveRewardsNativeWorker.REWARDS_NOTIFICATION_TIPS_PROCESSED:
                 actionNotificationButton.setText(mPopupView.getResources().getString(R.string.ok));
@@ -1418,11 +1396,6 @@ public class BraveRewardsPanel
                 btnVerifyWallet.setCompoundDrawablesWithIntrinsicBounds(
                         leftDrawable, 0, rightDrawable, 0);
                 btnVerifyWallet.setBackgroundColor(Color.TRANSPARENT);
-
-                // show Add funds button
-                if (mBtnAddFunds != null) {
-                    mBtnAddFunds.setVisibility(View.VISIBLE);
-                }
                 break;
             case WalletStatus.LOGGED_OUT:
                 leftDrawable = getWalletIcon(walletType);
@@ -1441,12 +1414,6 @@ public class BraveRewardsPanel
         btnVerifyWallet.setText(mPopupView.getResources().getString(textId));
         Log.e(TAG, "before onClick");
         setVerifyWalletButtonClickEvent(btnVerifyWallet, status);
-
-        // Update add funds button based on status
-        if (status != WalletStatus.CONNECTED) {
-            mBtnAddFunds.setEnabled(false);
-            return;
-        }
     }
 
     private void setVerifyWalletButtonClickEvent(View btnVerifyWallet, final int status) {
@@ -1760,13 +1727,11 @@ public class BraveRewardsPanel
 
         Intent intent = new Intent(ContextUtils.getApplicationContext(), clazz);
         intent.putExtra(BraveRewardsExternalWallet.ACCOUNT_URL, mExternalWallet.getAccountUrl());
-        intent.putExtra(BraveRewardsExternalWallet.ADD_URL, mExternalWallet.getAddUrl());
         intent.putExtra(BraveRewardsExternalWallet.ADDRESS, mExternalWallet.getAddress());
         intent.putExtra(BraveRewardsExternalWallet.LOGIN_URL, mExternalWallet.getLoginUrl());
         intent.putExtra(BraveRewardsExternalWallet.STATUS, mExternalWallet.getStatus());
         intent.putExtra(BraveRewardsExternalWallet.TOKEN, mExternalWallet.getToken());
         intent.putExtra(BraveRewardsExternalWallet.USER_NAME, mExternalWallet.getUserName());
-        intent.putExtra(BraveRewardsExternalWallet.WITHDRAW_URL, mExternalWallet.getWithdrawUrl());
         return intent;
     }
 
