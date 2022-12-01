@@ -17,7 +17,6 @@
 #include "bat/ads/export.h"
 #include "bat/ads/public/interfaces/ads.mojom-forward.h"
 #include "brave/components/brave_federated/public/interfaces/brave_federated.mojom-forward.h"
-#include "brave/components/services/bat_ads/public/interfaces/bat_ads.mojom.h"
 
 namespace ads {
 
