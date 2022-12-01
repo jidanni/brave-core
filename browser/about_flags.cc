@@ -232,8 +232,8 @@ constexpr char kBraveVPNDescription[] = "Experimental native VPN support";
 
 constexpr char kBraveVPNDnsProtectionName[] = "Enable DoH for Brave VPN";
 constexpr char kBraveVPNDnsProtectionDescription[] =
-    "Automatically enable, if possible, DoH with Brave VPN on windows to avoid "
-    "DNS leak due to Smart Multi-Homed Name Resolution";
+    "Override DoH settings with Cloudflare dns if necessary to avoid leaking "
+    "requests due to Smart Multi-Home Named Resolution";
 
 constexpr char kBraveSkusSdkName[] = "Enable experimental SKU SDK";
 constexpr char kBraveSkusSdkDescription[] = "Experimental SKU SDK support";
