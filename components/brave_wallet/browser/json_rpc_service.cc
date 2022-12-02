@@ -190,6 +190,8 @@ JsonRpcService::JsonRpcService(
     : JsonRpcService(std::move(url_loader_factory), std::move(prefs), nullptr) {
 }
 
+JsonRpcService::JsonRpcService() : weak_ptr_factory_(this) {}
+
 void JsonRpcService::SetAPIRequestHelperForTesting(
     scoped_refptr<network::SharedURLLoaderFactory> url_loader_factory) {
   api_request_helper_ = std::make_unique<APIRequestHelper>(
@@ -2039,14 +2041,14 @@ void JsonRpcService::GetTokenMetadata(const std::string& contract_address,
   auto network_url = GetNetworkURL(prefs_, chain_id, mojom::CoinType::ETH);
   if (!network_url.is_valid()) {
     std::move(callback).Run(
-        "", mojom::ProviderError::kInvalidParams,
+        "", "", mojom::ProviderError::kInvalidParams,
         l10n_util::GetStringUTF8(IDS_WALLET_INVALID_PARAMETERS));
     return;
   }
 
   if (!EthAddress::IsValidAddress(contract_address)) {
     std::move(callback).Run(
-        "", mojom::ProviderError::kInvalidParams,
+        "", "", mojom::ProviderError::kInvalidParams,
         l10n_util::GetStringUTF8(IDS_WALLET_INVALID_PARAMETERS));
     return;
   }
@@ -2054,7 +2056,7 @@ void JsonRpcService::GetTokenMetadata(const std::string& contract_address,
   uint256_t token_id_uint = 0;
   if (!HexValueToUint256(token_id, &token_id_uint)) {
     std::move(callback).Run(
-        "", mojom::ProviderError::kInvalidParams,
+        "", "", mojom::ProviderError::kInvalidParams,
         l10n_util::GetStringUTF8(IDS_WALLET_INVALID_PARAMETERS));
     return;
   }
@@ -2063,21 +2065,21 @@ void JsonRpcService::GetTokenMetadata(const std::string& contract_address,
   if (interface_id == kERC721MetadataInterfaceId) {
     if (!erc721::TokenUri(token_id_uint, &function_signature)) {
       std::move(callback).Run(
-          "", mojom::ProviderError::kInvalidParams,
+          "", "", mojom::ProviderError::kInvalidParams,
           l10n_util::GetStringUTF8(IDS_WALLET_INVALID_PARAMETERS));
       return;
     }
   } else if (interface_id == kERC1155MetadataInterfaceId) {
     if (!erc1155::Uri(token_id_uint, &function_signature)) {
       std::move(callback).Run(
-          "", mojom::ProviderError::kInvalidParams,
+          "", "", mojom::ProviderError::kInvalidParams,
           l10n_util::GetStringUTF8(IDS_WALLET_INVALID_PARAMETERS));
       return;
     }
   } else {
     // Unknown inteface ID
     std::move(callback).Run(
-        "", mojom::ProviderError::kInvalidParams,
+        "", "", mojom::ProviderError::kInvalidParams,
         l10n_util::GetStringUTF8(IDS_WALLET_INVALID_PARAMETERS));
     return;
   }
@@ -2100,13 +2102,13 @@ void JsonRpcService::OnGetSupportsInterfaceTokenMetadata(
     mojom::ProviderError error,
     const std::string& error_message) {
   if (error != mojom::ProviderError::kSuccess) {
-    std::move(callback).Run("", error, error_message);
+    std::move(callback).Run("", "", error, error_message);
     return;
   }
 
   if (!is_supported) {
     std::move(callback).Run(
-        "", mojom::ProviderError::kMethodNotSupported,
+        "", "", mojom::ProviderError::kMethodNotSupported,
         l10n_util::GetStringUTF8(IDS_WALLET_METHOD_NOT_SUPPORTED_ERROR));
     return;
   }
@@ -2124,7 +2126,7 @@ void JsonRpcService::OnGetTokenUri(GetTokenMetadataCallback callback,
                                    APIRequestResult api_request_result) {
   if (!api_request_result.Is2XXResponseCode()) {
     std::move(callback).Run(
-        "", mojom::ProviderError::kInternalError,
+        "", "", mojom::ProviderError::kInternalError,
         l10n_util::GetStringUTF8(IDS_WALLET_INTERNAL_ERROR));
     return;
   }
@@ -2136,9 +2138,10 @@ void JsonRpcService::OnGetTokenUri(GetTokenMetadataCallback callback,
     std::string error_message;
     ParseErrorResult<mojom::ProviderError>(api_request_result.body(), &error,
                                            &error_message);
-    std::move(callback).Run("", error, error_message);
+    std::move(callback).Run("", "", error, error_message);
     return;
   }
+  std::string token_url_spec = url.spec();
 
   // Obtain JSON from the URL depending on the scheme.
   // IPFS, HTTPS, and data URIs are supported.
@@ -2152,7 +2155,7 @@ void JsonRpcService::OnGetTokenUri(GetTokenMetadataCallback callback,
   if (scheme != url::kDataScheme && scheme != url::kHttpsScheme) {
 #endif
     std::move(callback).Run(
-        "", mojom::ProviderError::kMethodNotSupported,
+        "", "", mojom::ProviderError::kMethodNotSupported,
         l10n_util::GetStringUTF8(IDS_WALLET_METHOD_NOT_SUPPORTED_ERROR));
     return;
   }
@@ -2160,7 +2163,7 @@ void JsonRpcService::OnGetTokenUri(GetTokenMetadataCallback callback,
   if (scheme == url::kDataScheme) {
     if (!eth::ParseDataURIAndExtractJSON(url, &metadata_json)) {
       std::move(callback).Run(
-          "", mojom::ProviderError::kParsingError,
+          "", "", mojom::ProviderError::kParsingError,
           l10n_util::GetStringUTF8(IDS_WALLET_PARSING_ERROR));
       return;
     }
@@ -2169,7 +2172,8 @@ void JsonRpcService::OnGetTokenUri(GetTokenMetadataCallback callback,
     data_decoder::JsonSanitizer::Sanitize(
         std::move(metadata_json),
         base::BindOnce(&JsonRpcService::OnSanitizeTokenMetadata,
-                       weak_ptr_factory_.GetWeakPtr(), std::move(callback)));
+                       weak_ptr_factory_.GetWeakPtr(), token_url_spec,
+                       std::move(callback)));
     return;
   }
 
@@ -2177,7 +2181,7 @@ void JsonRpcService::OnGetTokenUri(GetTokenMetadataCallback callback,
   if (scheme == ipfs::kIPFSScheme &&
       !ipfs::TranslateIPFSURI(url, &url, ipfs::GetDefaultNFTIPFSGateway(prefs_),
                               false)) {
-    std::move(callback).Run("", mojom::ProviderError::kParsingError,
+    std::move(callback).Run("", "", mojom::ProviderError::kParsingError,
                             l10n_util::GetStringUTF8(IDS_WALLET_PARSING_ERROR));
     return;
   }
@@ -2185,17 +2189,19 @@ void JsonRpcService::OnGetTokenUri(GetTokenMetadataCallback callback,
 
   auto internal_callback =
       base::BindOnce(&JsonRpcService::OnGetTokenMetadataPayload,
-                     weak_ptr_factory_.GetWeakPtr(), std::move(callback));
+                     weak_ptr_factory_.GetWeakPtr(), std::move(callback),
+                     std::move(token_url_spec));
   api_request_helper_->Request("GET", url, "", "", true,
                                std::move(internal_callback));
 }
 
 void JsonRpcService::OnSanitizeTokenMetadata(
+    const std::string& token_url,
     GetTokenMetadataCallback callback,
     data_decoder::JsonSanitizer::Result result) {
   if (result.error) {
     VLOG(1) << "Data URI JSON validation error:" << *result.error;
-    std::move(callback).Run("", mojom::ProviderError::kParsingError,
+    std::move(callback).Run("", "", mojom::ProviderError::kParsingError,
                             l10n_util::GetStringUTF8(IDS_WALLET_PARSING_ERROR));
     return;
   }
@@ -2205,27 +2211,29 @@ void JsonRpcService::OnSanitizeTokenMetadata(
     metadata_json = result.value.value();
   }
 
-  std::move(callback).Run(metadata_json, mojom::ProviderError::kSuccess, "");
+  std::move(callback).Run(token_url, metadata_json,
+                          mojom::ProviderError::kSuccess, "");
 }
 
 void JsonRpcService::OnGetTokenMetadataPayload(
     GetTokenMetadataCallback callback,
+    const std::string& token_url,
     APIRequestResult api_request_result) {
   if (!api_request_result.Is2XXResponseCode()) {
     std::move(callback).Run(
-        "", mojom::ProviderError::kInternalError,
+        token_url, "", mojom::ProviderError::kInternalError,
         l10n_util::GetStringUTF8(IDS_WALLET_INTERNAL_ERROR));
     return;
   }
 
   // Invalid JSON becomes an empty string after sanitization
   if (api_request_result.body().empty()) {
-    std::move(callback).Run("", mojom::ProviderError::kParsingError,
+    std::move(callback).Run(token_url, "", mojom::ProviderError::kParsingError,
                             l10n_util::GetStringUTF8(IDS_WALLET_PARSING_ERROR));
     return;
   }
 
-  std::move(callback).Run(api_request_result.body(),
+  std::move(callback).Run(token_url, api_request_result.body(),
                           mojom::ProviderError::kSuccess, "");
 }
 

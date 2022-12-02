@@ -83,6 +83,8 @@ BraveWalletP3A::BraveWalletP3A(BraveWalletService* wallet_service,
   AddObservers();
 }
 
+BraveWalletP3A::BraveWalletP3A() {}
+
 BraveWalletP3A::~BraveWalletP3A() = default;
 
 void BraveWalletP3A::AddObservers() {

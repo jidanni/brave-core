@@ -41,6 +41,8 @@ class BraveWalletP3A : public mojom::BraveWalletServiceObserver,
   BraveWalletP3A(BraveWalletService* wallet_service,
                  KeyringService* keyring_service,
                  PrefService* pref_service);
+  // For testing
+  BraveWalletP3A();
 
   ~BraveWalletP3A() override;
   BraveWalletP3A(const BraveWalletP3A&) = delete;

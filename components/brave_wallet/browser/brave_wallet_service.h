@@ -64,6 +64,8 @@ class BraveWalletService : public KeyedService,
                      JsonRpcService* json_rpc_service,
                      TxService* tx_service,
                      PrefService* prefs);
+  // For tests
+  BraveWalletService();
   ~BraveWalletService() override;
 
   BraveWalletService(const BraveWalletService&) = delete;
@@ -89,6 +91,9 @@ class BraveWalletService : public KeyedService,
   // mojom::BraveWalletService:
   void AddObserver(::mojo::PendingRemote<mojom::BraveWalletServiceObserver>
                        observer) override;
+  void AddTokenObserver(
+      ::mojo::PendingRemote<mojom::BraveWalletServiceTokenObserver> observer)
+      override;
 
   void GetUserAssets(const std::string& chain_id,
                      mojom::CoinType coin,
@@ -312,6 +317,7 @@ class BraveWalletService : public KeyedService,
       decrypt_callbacks_;
   base::flat_map<url::Origin, base::Value> decrypt_ids_;
   mojo::RemoteSet<mojom::BraveWalletServiceObserver> observers_;
+  mojo::RemoteSet<mojom::BraveWalletServiceTokenObserver> token_observers_;
   std::unique_ptr<BraveWalletServiceDelegate> delegate_;
   raw_ptr<KeyringService> keyring_service_ = nullptr;
   raw_ptr<JsonRpcService> json_rpc_service_ = nullptr;

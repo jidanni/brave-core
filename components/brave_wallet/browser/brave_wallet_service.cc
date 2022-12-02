@@ -214,6 +214,8 @@ BraveWalletService::BraveWalletService(
   OnP3ATimerFired();  // Also call on startup
 }
 
+BraveWalletService::BraveWalletService() : weak_ptr_factory_(this) {}
+
 BraveWalletService::~BraveWalletService() = default;
 
 mojo::PendingRemote<mojom::BraveWalletService>
@@ -368,6 +370,7 @@ bool BraveWalletService::AddUserAsset(mojom::BlockchainTokenPtr token,
   value.Set("coingecko_id", token->coingecko_id);
 
   user_assets_list->Append(std::move(value));
+
   return true;
 }
 
@@ -380,7 +383,15 @@ void BraveWalletService::GetUserAssets(const std::string& chain_id,
 }
 
 bool BraveWalletService::AddUserAsset(mojom::BlockchainTokenPtr token) {
-  return BraveWalletService::AddUserAsset(std::move(token), prefs_);
+  mojom::BlockchainTokenPtr clone = token.Clone();
+  bool result = BraveWalletService::AddUserAsset(std::move(token), prefs_);
+
+  if (result) {
+    for (const auto& observer : token_observers_) {
+      observer->OnTokenAdded(clone.Clone());
+    }
+  }
+  return result;
 }
 
 void BraveWalletService::AddUserAsset(mojom::BlockchainTokenPtr token,
@@ -417,6 +428,11 @@ bool BraveWalletService::RemoveUserAsset(mojom::BlockchainTokenPtr token) {
       FindAsset(user_assets_list, *address, token->token_id, token->is_erc721);
   if (it != user_assets_list->end())
     user_assets_list->erase(it);
+
+  for (const auto& observer : token_observers_) {
+    observer->OnTokenRemoved(token.Clone());
+  }
+
   return true;
 }
 
@@ -1107,6 +1123,11 @@ void BraveWalletService::NotifySignAllTransactionsRequestProcessed(
 void BraveWalletService::AddObserver(
     ::mojo::PendingRemote<mojom::BraveWalletServiceObserver> observer) {
   observers_.Add(std::move(observer));
+}
+
+void BraveWalletService::AddTokenObserver(
+    ::mojo::PendingRemote<mojom::BraveWalletServiceTokenObserver> observer) {
+  token_observers_.Add(std::move(observer));
 }
 
 void BraveWalletService::OnActiveOriginChanged(

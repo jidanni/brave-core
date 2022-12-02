@@ -54,6 +54,7 @@ class JsonRpcService : public KeyedService, public mojom::JsonRpcService {
   JsonRpcService(
       scoped_refptr<network::SharedURLLoaderFactory> url_loader_factory,
       PrefService* prefs);
+  JsonRpcService();
   ~JsonRpcService() override;
 
   static void MigrateMultichainNetworks(PrefService* prefs);
@@ -300,7 +301,8 @@ class JsonRpcService : public KeyedService, public mojom::JsonRpcService {
                              GetERC721TokenBalanceCallback callback) override;
 
   using GetTokenMetadataCallback =
-      base::OnceCallback<void(const std::string& result,
+      base::OnceCallback<void(const std::string& token_url,
+                              const std::string& result,
                               mojom::ProviderError error,
                               const std::string& error_message)>;
 
@@ -535,9 +537,11 @@ class JsonRpcService : public KeyedService, public mojom::JsonRpcService {
                      const APIRequestResult api_request_result);
 
   void OnGetTokenMetadataPayload(GetTokenMetadataCallback callback,
+                                 const std::string& token_url,
                                  APIRequestResult api_request_result);
 
-  void OnSanitizeTokenMetadata(GetTokenMetadataCallback callback,
+  void OnSanitizeTokenMetadata(const std::string& token_url,
+                               GetTokenMetadataCallback callback,
                                data_decoder::JsonSanitizer::Result result);
 
   void OnGetSupportsInterface(GetSupportsInterfaceCallback callback,

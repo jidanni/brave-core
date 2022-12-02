@@ -88,6 +88,8 @@ void RegisterProfilePrefs(user_prefs::PrefRegistrySyncable* registry) {
   registry->RegisterDictionaryPref(kBraveWalletLastTransactionSentTimeDict);
   registry->RegisterDictionaryPref(kBraveWalletNextAssetDiscoveryFromBlocks);
   registry->RegisterTimePref(kBraveWalletLastDiscoveredAssetsAt, base::Time());
+  registry->RegisterDictionaryPref(kPinnedErc721Assets);
+  registry->RegisterBooleanPref(kAutoPinEnabled, true);
 }
 
 void RegisterProfilePrefsForMigration(
@@ -154,6 +156,7 @@ void ClearBraveWalletServicePrefs(PrefService* prefs) {
   prefs->ClearPref(kBraveWalletUserAssets);
   prefs->ClearPref(kDefaultBaseCurrency);
   prefs->ClearPref(kDefaultBaseCryptocurrency);
+  prefs->ClearPref(kPinnedErc721Assets);
 }
 
 void MigrateObsoleteProfilePrefs(PrefService* prefs) {
