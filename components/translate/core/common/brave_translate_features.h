@@ -37,7 +37,7 @@ bool ShouldUpdateLanguagesList();
 bool UseGoogleTranslateEndpoint();
 
 // True if automatic translation logic is enabled.
-// This include core logic and UI element.
+// Includes core logic and UI elements.
 bool IsBraveAutoTranslateEnabled();
 
 }  // namespace translate
