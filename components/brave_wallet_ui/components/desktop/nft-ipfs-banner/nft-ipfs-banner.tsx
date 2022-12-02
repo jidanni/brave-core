@@ -23,7 +23,7 @@ import {
   Text,
   LearnMore,
   CloseButton
-} from './nft-ipfs-banner.styles'
+} from './nft-ipfs-banner.style'
 
 export const NftIpfsBanner = ({ status, onDismiss }: Props) => {
   const history = useHistory()

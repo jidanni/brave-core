@@ -23,6 +23,7 @@ import { NftDetails } from '../nft/components/nft-details/nft-details'
 import { mockNewAssetOptions } from './mock-data/mock-asset-options'
 import { mockNFTMetadata } from './mock-data/mock-nft-metadata'
 import { mockNetwork } from '../common/constants/mocks'
+import { NftPinnigStatus } from '../components/desktop/nft-pinning-status/nft-pinning-status'
 
 export default {
   title: 'Wallet/Desktop/Components',
@@ -202,4 +203,16 @@ export const _NftDetails = () => {
 
 _NftDetails.story = {
   name: 'NFT Details'
+}
+
+export const _NftPinningStatus = () => {
+  return (
+    <NftPinnigStatus
+      pinningStatus='failed'
+    />
+  )
+}
+
+_NftPinningStatus.story = {
+  title: 'NFT Pinning Status'
 }

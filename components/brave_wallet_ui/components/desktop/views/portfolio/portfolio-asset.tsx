@@ -34,7 +34,8 @@ import {
   UpdateNFtMetadataMessage,
   UpdateSelectedAssetMessage,
   UpdateTokenNetworkMessage,
-  braveNftDisplayOrigin
+  braveNftDisplayOrigin,
+  IframeSize
 } from '../../../../nft/nft-ui-messages'
 import { auroraSupportedContractAddresses } from '../../../../utils/asset-utils'
 import { getLocale } from '../../../../../common/locale'
@@ -117,6 +118,7 @@ export const PortfolioAsset = (props: Props) => {
   const [showTokenDetailsModal, setShowTokenDetailsModal] = React.useState<boolean>(false)
   const [showHideTokenModel, setShowHideTokenModal] = React.useState<boolean>(false)
   const [showNftModal, setshowNftModal] = React.useState<boolean>(false)
+  const [iframeHeight, setIframeHeight] = React.useState<string>('440px')
 
   // routing
   const history = useHistory()
@@ -466,6 +468,12 @@ export const PortfolioAsset = (props: Props) => {
       const { payload } = message as ToggleNftModal
       setshowNftModal(payload)
     }
+
+    if (message.command === NftUiCommand.IframeSize) {
+      const { payload } = message as IframeSize
+      setIframeHeight(payload.height + 'px')
+      console.log('payload', payload)
+    }
   }, [])
 
   const onSelectBuy = React.useCallback(() => {
@@ -711,6 +719,7 @@ export const PortfolioAsset = (props: Props) => {
         sandbox="allow-scripts allow-popups allow-same-origin"
         src='chrome-untrusted://nft-display'
         allowFullScreen
+        style={{ height: iframeHeight }}
       />
 
       {showNftModal && nftMetadata?.imageURL &&

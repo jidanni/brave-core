@@ -81,8 +81,6 @@ export const LearnMore = styled(WalletButton)`
   font-weight: 500;
   font-size: 14px;
   line-height: 20px;
-  display: inline-flex;
-  align-items: center;
   color: ${p => p.theme.palette.white};
   outline: none;
   border: none;

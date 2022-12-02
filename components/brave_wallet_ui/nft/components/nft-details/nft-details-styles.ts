@@ -248,6 +248,10 @@ export const HighlightedDetailSectionValue = styled.p`
   color: ${p => p.theme.color.interactive05};
   margin: 0;
   padding: 0;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
 `
 
 export const CopyIcon = styled.button`

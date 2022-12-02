@@ -50,6 +50,7 @@ import { MultimediaWrapper } from '../nft-content/nft-content-styles'
 import { CreateNetworkIcon } from '../../../components/shared'
 import { Row } from '../../../components/shared/style'
 import CopyTooltip from '../../../components/shared/copy-tooltip/copy-tooltip'
+import { NftPinnigStatus } from '../../../components/desktop/nft-pinning-status/nft-pinning-status'
 
 interface Props {
   isLoading?: boolean
@@ -182,10 +183,17 @@ export const NftDetails = ({ selectedAsset, nftMetadata, nftMetadataError, token
                     <ProjectDetailDescription>Qmdieskenfisef3135422524</ProjectDetailDescription>
                   </DetailSectionColumn>
                 </DetailSectionRow>
-                <DetailSectionColumn>
-                  <DetailSectionTitle>Image location or address</DetailSectionTitle>
-                  <HighlightedDetailSectionValue>{selectedAsset.logo}</HighlightedDetailSectionValue>
-                </DetailSectionColumn>
+                <DetailSectionRow>
+                  <DetailSectionColumn>
+                    <DetailSectionTitle>Image location or address</DetailSectionTitle>
+                    <HighlightedDetailSectionValue>{selectedAsset.logo}</HighlightedDetailSectionValue>
+                  </DetailSectionColumn>
+                </DetailSectionRow>
+                <DetailSectionRow>
+                  <DetailSectionColumn>
+                    <NftPinnigStatus pinningStatus='failed' />
+                  </DetailSectionColumn>
+                </DetailSectionRow>
               </DetailColumn>
             </>
           }
