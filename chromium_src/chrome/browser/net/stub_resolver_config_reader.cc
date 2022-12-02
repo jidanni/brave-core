@@ -19,20 +19,30 @@
 namespace {
 
 bool ShouldOverride(PrefService* local_state,
-                    SecureDnsConfig::ManagementMode management_mode) {
-  if (management_mode != SecureDnsConfig::ManagementMode::kNoOverride) {
+                    SecureDnsConfig::ManagementMode management_mode,
+                    bool is_managed) {
+  if (management_mode != SecureDnsConfig::ManagementMode::kNoOverride ||
+      is_managed) {
     // there is already a managed policy or parental control in place
     return false;
   }
-
-  return !local_state->GetString(brave_vpn::prefs::kBraveVpnDnsConfig).empty();
+  auto* pref =
+      local_state->FindPreference(brave_vpn::prefs::kBraveVpnDnsConfig);
+  if (!pref)
+    return false;
+  auto* value = pref->GetValue();
+  if (!value)
+    return false;
+  auto* servers_to_override = value->GetIfString();
+  return servers_to_override && !servers_to_override->empty();
 }
 
 bool MaybeOverrideDnsClientEnabled(
     bool insecure_dns_client_enabled,
     PrefService* local_state,
-    SecureDnsConfig::ManagementMode forced_management_mode) {
-  if (ShouldOverride(local_state, forced_management_mode)) {
+    SecureDnsConfig::ManagementMode management_mode,
+    bool is_managed) {
+  if (ShouldOverride(local_state, management_mode, is_managed)) {
     // disable the insecure client for doh
     return false;
   }
@@ -43,8 +53,9 @@ bool MaybeOverrideDnsClientEnabled(
 net::SecureDnsMode MaybeOverrideDnsMode(
     net::SecureDnsMode secure_dns_mode,
     PrefService* local_state,
-    SecureDnsConfig::ManagementMode management_mode) {
-  if (!ShouldOverride(local_state, management_mode)) {
+    SecureDnsConfig::ManagementMode management_mode,
+    bool is_managed) {
+  if (!ShouldOverride(local_state, management_mode, is_managed)) {
     return secure_dns_mode;
   }
   return net::SecureDnsMode::kSecure;
@@ -53,8 +64,9 @@ net::SecureDnsMode MaybeOverrideDnsMode(
 net::DnsOverHttpsConfig MaybeOverrideDnsConfig(
     net::DnsOverHttpsConfig doh_config,
     PrefService* local_state,
-    SecureDnsConfig::ManagementMode management_mode) {
-  if (!ShouldOverride(local_state, management_mode)) {
+    SecureDnsConfig::ManagementMode management_mode,
+    bool is_managed) {
+  if (!ShouldOverride(local_state, management_mode, is_managed)) {
     return doh_config;
   }
   return net::DnsOverHttpsConfig::FromStringLax(
@@ -63,10 +75,12 @@ net::DnsOverHttpsConfig MaybeOverrideDnsConfig(
 
 SecureDnsConfig::ManagementMode MaybeOverrideForcedManagementMode(
     PrefService* local_state,
-    SecureDnsConfig::ManagementMode management_mode) {
+    SecureDnsConfig::ManagementMode management_mode,
+    bool is_managed) {
   if (management_mode != SecureDnsConfig::ManagementMode::kNoOverride)
     return management_mode;
-  if (!ShouldOverride(local_state, management_mode)) {
+
+  if (!ShouldOverride(local_state, management_mode, is_managed)) {
     return management_mode;
   }
   return SecureDnsConfig::ManagementMode::kDisabledManaged;
@@ -74,25 +88,25 @@ SecureDnsConfig::ManagementMode MaybeOverrideForcedManagementMode(
 
 }  // namespace
 
-#define SecureDnsConfig(SECURE_DNS_MODE, SECURE_DOH_CONFIG,   \
-                        FORCED_MANAGEMENT_MODE)               \
-  SecureDnsConfig(                                            \
-      MaybeOverrideDnsMode(SECURE_DNS_MODE, local_state_,     \
-                           FORCED_MANAGEMENT_MODE),           \
-      MaybeOverrideDnsConfig(SECURE_DOH_CONFIG, local_state_, \
-                             FORCED_MANAGEMENT_MODE),         \
-      MaybeOverrideForcedManagementMode(local_state_, FORCED_MANAGEMENT_MODE))
+#define SecureDnsConfig(SECURE_DNS_MODE, SECURE_DOH_CONFIG,                   \
+                        FORCED_MANAGEMENT_MODE)                               \
+  SecureDnsConfig(MaybeOverrideDnsMode(SECURE_DNS_MODE, local_state_,         \
+                                       FORCED_MANAGEMENT_MODE, is_managed),   \
+                  MaybeOverrideDnsConfig(SECURE_DOH_CONFIG, local_state_,     \
+                                         FORCED_MANAGEMENT_MODE, is_managed), \
+                  MaybeOverrideForcedManagementMode(                          \
+                      local_state_, FORCED_MANAGEMENT_MODE, is_managed))
 
 #define ConfigureStubHostResolver(INSECURE_DNS_CLIENT_ENABLED,                 \
                                   SECURE_DNS_MODE, DNS_OVER_HTTPS_CONFIG,      \
                                   ADDITIONAL_DNS_TYPES_ENABLED)                \
   ConfigureStubHostResolver(                                                   \
       MaybeOverrideDnsClientEnabled(INSECURE_DNS_CLIENT_ENABLED, local_state_, \
-                                    forced_management_mode),                   \
+                                    forced_management_mode, is_managed),       \
       MaybeOverrideDnsMode(SECURE_DNS_MODE, local_state_,                      \
-                           forced_management_mode),                            \
+                           forced_management_mode, is_managed),                \
       MaybeOverrideDnsConfig(DNS_OVER_HTTPS_CONFIG, local_state_,              \
-                             forced_management_mode),                          \
+                             forced_management_mode, is_managed),              \
       ADDITIONAL_DNS_TYPES_ENABLED)
 #endif
 #include "src/chrome/browser/net/stub_resolver_config_reader.cc"

@@ -28,21 +28,6 @@
 
 namespace brave_vpn {
 
-namespace {
-absl::optional<std::string> GetPolicyValue(const std::string& name) {
-  auto* service = g_browser_process->policy_service();
-  if (!service)
-    return absl::nullopt;
-  auto ns =
-      policy::PolicyNamespace(policy::POLICY_DOMAIN_CHROME, std::string());
-  const base::Value* mode =
-      service->GetPolicies(ns).GetValue(name, base::Value::Type::STRING);
-  if (!mode || !mode->is_string())
-    return absl::nullopt;
-  return mode->GetString();
-}
-
-}  // namespace
 // static
 BraveVpnDnsObserverFactory* BraveVpnDnsObserverFactory::GetInstance() {
   return base::Singleton<BraveVpnDnsObserverFactory>::get();
@@ -58,8 +43,7 @@ BraveVpnDnsObserverFactory::BraveVpnDnsObserverFactory()
 KeyedService* BraveVpnDnsObserverFactory::BuildServiceInstanceFor(
     content::BrowserContext* context) const {
   return new BraveVpnDnsObserverService(g_browser_process->local_state(),
-                                        user_prefs::UserPrefs::Get(context),
-                                        base::BindRepeating(&GetPolicyValue));
+                                        user_prefs::UserPrefs::Get(context));
 }
 
 // static

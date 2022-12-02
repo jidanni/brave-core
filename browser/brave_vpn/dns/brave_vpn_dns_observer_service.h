@@ -37,8 +37,7 @@ class BraveVpnDnsObserverService : public brave_vpn::BraveVPNServiceObserver,
       base::RepeatingCallback<absl::optional<std::string>(const std::string&)>;
 
   explicit BraveVpnDnsObserverService(PrefService* local_state,
-                                      PrefService* profile_prefs,
-                                      DnsPolicyReaderCallback callback);
+                                      PrefService* profile_prefs);
   ~BraveVpnDnsObserverService() override;
   BraveVpnDnsObserverService(const BraveVpnDnsObserverService&) = delete;
   BraveVpnDnsObserverService operator=(const BraveVpnDnsObserverService&) =
@@ -59,7 +58,6 @@ class BraveVpnDnsObserverService : public brave_vpn::BraveVPNServiceObserver,
   void SetPrefServiceForTesting(PrefService* service) {
     pref_service_for_testing_ = service;
   }
-  bool IsDnsModeConfiguredByPolicy() const;
 
  private:
   friend class BraveVpnDnsObserverServiceUnitTest;
