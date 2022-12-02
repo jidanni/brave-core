@@ -5,11 +5,16 @@
 
 import { createEntityAdapter } from '@reduxjs/toolkit'
 
-import { BraveWallet } from '../../../constants/types'
+import { BraveWallet, WalletAccountTypeName } from '../../../constants/types'
 import { RootStoreState } from '../../../page/store'
 import { walletApi } from '../api.slice'
 
-export const accountInfoEntityAdaptor = createEntityAdapter<BraveWallet.AccountInfo>({
+export type AccountInfoEntity = BraveWallet.AccountInfo & {
+  accountType: WalletAccountTypeName
+  deviceId: Exclude<BraveWallet.AccountInfo['hardware'], undefined>['deviceId']
+}
+
+export const accountInfoEntityAdaptor = createEntityAdapter<AccountInfoEntity>({
   selectId: (accountInfo) => accountInfo.address.toLowerCase()
 })
 export const accountInfoEntityAdaptorInitialState = accountInfoEntityAdaptor.getInitialState()

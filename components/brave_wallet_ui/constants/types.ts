@@ -6,6 +6,7 @@
 import { TimeDelta } from 'gen/mojo/public/mojom/base/time.mojom.m.js'
 import * as BraveWallet from 'gen/brave/components/brave_wallet/common/brave_wallet.mojom.m.js'
 import { HardwareWalletResponseCodeType } from '../common/hardware/types'
+import { EntityId } from '@reduxjs/toolkit'
 
 // Re-export BraveWallet for use in other modules, to avoid hard-coding the
 // path of generated mojom files.
@@ -20,13 +21,15 @@ interface TokenBalanceRegistry {
 const BraveKeyringsTypes = [BraveWallet.DEFAULT_KEYRING_ID, BraveWallet.FILECOIN_KEYRING_ID, BraveWallet.SOLANA_KEYRING_ID] as const
 export type BraveKeyrings = typeof BraveKeyringsTypes[number]
 
+export type WalletAccountTypeName = 'Primary' | 'Secondary' | 'Ledger' | 'Trezor'
+
 export interface WalletAccountType {
   id: string
   name: string
   address: string
   tokenBalanceRegistry: TokenBalanceRegistry
   nativeBalanceRegistry: TokenBalanceRegistry
-  accountType: 'Primary' | 'Secondary' | 'Ledger' | 'Trezor'
+  accountType: WalletAccountTypeName
   deviceId?: string
   coin: BraveWallet.CoinType
   // Used to separate networks for filecoin.
@@ -386,6 +389,13 @@ export interface BalancePayload {
   error: number
   errorMessage: string
   chainId: string
+}
+
+export interface AccountTokenBalanceForChainId {
+  accountEntityId: EntityId
+  tokenEntityId: EntityId
+  balance: string
+  chainId: EntityId
 }
 
 export interface GetNativeAssetBalancesPayload {
