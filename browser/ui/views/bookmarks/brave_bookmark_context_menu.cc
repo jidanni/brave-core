@@ -30,9 +30,7 @@ BraveBookmarkContextMenu::BraveBookmarkContextMenu(
                           selection,
                           close_on_remove) {
   auto* submenu = menu()->GetMenuItemByID(IDC_BRAVE_BOOKMARK_BAR_SUBMENU);
-  if (!submenu) {
-    return;
-  }
+  DCHECK(submenu);
   auto* submenu_model = controller_->GetBookmarkSubmenuModel();
   for (size_t j = 0; j < submenu_model->GetItemCount(); ++j) {
     views::MenuModelAdapter::AppendMenuItemFromModel(

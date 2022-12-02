@@ -38,6 +38,8 @@ class BraveBookmarkContextMenuController
 
   ~BraveBookmarkContextMenuController() override;
 
+  BookmarkBarSubMenuModel* GetBookmarkSubmenuModel();
+
   // ui::SimpleMenuModel::Delegate implementation:
   bool IsCommandIdChecked(int command_id) const override;
   bool IsCommandIdEnabled(int command_id) const override;
@@ -46,9 +48,8 @@ class BraveBookmarkContextMenuController
   bool IsItemForCommandIdDynamic(int command_id) const override;
   std::u16string GetLabelForCommandId(int command_id) const override;
 
+ private:
   void AddBraveBookmarksSubmenu(Profile* profile);
-
-  BookmarkBarSubMenuModel* GetBookmarkSubmenuModel();
 
   std::unique_ptr<BookmarkBarSubMenuModel> brave_bookmarks_submenu_model_;
 };
