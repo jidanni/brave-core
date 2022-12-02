@@ -9,8 +9,8 @@
 
 #if BUILDFLAG(IS_WIN)
 #include "brave/components/brave_vpn/features.h"
-#include "brave/components/brave_vpn/pref_names.h"
 #include "chrome/browser/browser_process.h"
+#include "chrome/common/pref_names.h"
 #include "components/grit/brave_components_strings.h"
 #include "components/prefs/pref_service.h"
 
@@ -21,7 +21,7 @@ bool ShouldReplaceSecureDNSDisabledDescription() {
           brave_vpn::features::kBraveVPNDnsProtection))
     return false;
   return !g_browser_process->local_state()
-              ->GetString(brave_vpn::prefs::kBraveVpnDnsConfig)
+              ->GetString(prefs::kBraveVpnDnsConfig)
               .empty();
 }
 

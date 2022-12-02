@@ -38,7 +38,6 @@ constexpr char kBraveVPNLastUseTime[] = "brave.brave_vpn.last_use_time";
 constexpr char kBraveVPNUsedSecondDay[] = "brave.brave_vpn.used_second_day";
 constexpr char kBraveVPNDaysInMonthUsed[] =
     "brave.brave_vpn.days_in_month_used";
-constexpr char kBraveVpnDnsConfig[] = "brave.brave_vpn.dns_config";
 }  // namespace prefs
 
 }  // namespace brave_vpn

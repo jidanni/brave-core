@@ -18,6 +18,7 @@
 #include "brave/components/skus/browser/skus_utils.h"
 #include "brave/components/skus/common/features.h"
 #include "build/build_config.h"
+#include "chrome/common/pref_names.h"
 #include "components/pref_registry/pref_registry_syncable.h"
 #include "components/prefs/pref_registry_simple.h"
 #include "components/prefs/pref_service.h"
@@ -38,7 +39,9 @@ void RegisterVPNLocalStatePrefs(PrefRegistrySimple* registry) {
   registry->RegisterDictionaryPref(prefs::kBraveVPNRootPref);
   registry->RegisterDictionaryPref(prefs::kBraveVPNSubscriberCredential);
   registry->RegisterBooleanPref(prefs::kBraveVPNLocalStateMigrated, false);
-  registry->RegisterStringPref(prefs::kBraveVpnDnsConfig, std::string());
+#if BUILDFLAG(IS_WIN)
+  registry->RegisterStringPref(::prefs::kBraveVpnDnsConfig, std::string());
+#endif
 }
 
 }  // namespace

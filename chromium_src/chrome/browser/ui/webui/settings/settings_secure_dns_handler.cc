@@ -13,7 +13,6 @@
 
 #if BUILDFLAG(IS_WIN) && BUILDFLAG(ENABLE_BRAVE_VPN)
 #include "brave/components/brave_vpn/features.h"
-#include "brave/components/brave_vpn/pref_names.h"
 
 #define kDnsOverHttpsTemplates kDnsOverHttpsTemplates, \
       base::BindRepeating( \
@@ -23,7 +22,7 @@
           brave_vpn::features::kBraveVPNDnsProtection)) {             \
     return;                                                           \
   }                                                                   \
-  pref_registrar_.Add(brave_vpn::prefs::kBraveVpnDnsConfig
+  pref_registrar_.Add(prefs::kBraveVpnDnsConfig
 #endif
 #include "src/chrome/browser/ui/webui/settings/settings_secure_dns_handler.cc"
 #if BUILDFLAG(IS_WIN) && BUILDFLAG(ENABLE_BRAVE_VPN)

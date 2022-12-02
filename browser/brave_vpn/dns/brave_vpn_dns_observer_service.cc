@@ -92,20 +92,19 @@ void BraveVpnDnsObserverService::ShowVpnNotificationDialog() {
 }
 
 void BraveVpnDnsObserverService::UnlockDNS() {
-  local_state_->ClearPref(brave_vpn::prefs::kBraveVpnDnsConfig);
+  local_state_->ClearPref(::prefs::kBraveVpnDnsConfig);
   // Read DNS config to initiate update of actual state.
   SystemNetworkContextManager::GetStubResolverConfigReader()
       ->UpdateNetworkService(false);
 }
 
 bool BraveVpnDnsObserverService::IsLocked() const {
-  return !local_state_->GetDict(prefs::kBraveVpnDnsConfig).empty();
+  return !local_state_->GetDict(::prefs::kBraveVpnDnsConfig).empty();
 }
 
 void BraveVpnDnsObserverService::LockDNS(const std::string& servers,
                                          bool show_notification) {
-  local_state_->SetString(brave_vpn::prefs::kBraveVpnDnsConfig,
-                          GetDoHServers(&servers));
+  local_state_->SetString(::prefs::kBraveVpnDnsConfig, GetDoHServers(&servers));
   // Read DNS config to initiate update of actual state.
   SystemNetworkContextManager::GetStubResolverConfigReader()
       ->UpdateNetworkService(false);

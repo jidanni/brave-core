@@ -7,15 +7,14 @@
 #include "brave/components/brave_vpn/buildflags/buildflags.h"
 #include "build/buildflag.h"
 #include "chrome/browser/net/secure_dns_config.h"
+#include "chrome/common/pref_names.h"
 #include "components/prefs/pref_service.h"
 #include "content/public/browser/network_service_instance.h"
 #include "net/dns/public/dns_over_https_config.h"
 #include "services/network/public/mojom/network_service.mojom.h"
 #include "third_party/abseil-cpp/absl/types/optional.h"
 
-#if BUILDFLAG(ENABLE_BRAVE_VPN) && BUILDFLAG(IS_WIN)
-#include "brave/components/brave_vpn/pref_names.h"
-
+#if BUILDFLAG(IS_WIN)
 namespace {
 
 bool ShouldOverride(PrefService* local_state,
@@ -26,8 +25,7 @@ bool ShouldOverride(PrefService* local_state,
     // there is already a managed policy or parental control in place
     return false;
   }
-  auto* pref =
-      local_state->FindPreference(brave_vpn::prefs::kBraveVpnDnsConfig);
+  auto* pref = local_state->FindPreference(prefs::kBraveVpnDnsConfig);
   if (!pref)
     return false;
   auto* value = pref->GetValue();
@@ -70,7 +68,7 @@ net::DnsOverHttpsConfig MaybeOverrideDnsConfig(
     return doh_config;
   }
   return net::DnsOverHttpsConfig::FromStringLax(
-      local_state->GetString(brave_vpn::prefs::kBraveVpnDnsConfig));
+      local_state->GetString(prefs::kBraveVpnDnsConfig));
 }
 
 SecureDnsConfig::ManagementMode MaybeOverrideForcedManagementMode(
@@ -110,7 +108,7 @@ SecureDnsConfig::ManagementMode MaybeOverrideForcedManagementMode(
       ADDITIONAL_DNS_TYPES_ENABLED)
 #endif
 #include "src/chrome/browser/net/stub_resolver_config_reader.cc"
-#if BUILDFLAG(ENABLE_BRAVE_VPN) && BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_WIN)
 #undef ConfigureStubHostResolver
 #undef SecureDnsConfig
 #endif
