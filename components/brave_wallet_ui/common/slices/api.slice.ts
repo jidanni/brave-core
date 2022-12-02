@@ -11,7 +11,6 @@ import {
   BraveWallet,
   ERC721Metadata,
   SupportedCoinTypes,
-  SupportedTestNetworks,
   WalletInfoBase
 } from '../../constants/types'
 import {
@@ -257,25 +256,6 @@ export function createWalletApi (
           }
         },
         providesTags: ['SelectedChainId']
-      }),
-      getIsTestNetworksEnabled: query<boolean, void>({
-        async queryFn (arg, api, extraOptions, baseQuery) {
-          try {
-            const { braveWalletService } = baseQuery(undefined).data
-
-            const { isEnabled: testNetworksEnabled } =
-              await braveWalletService.getShowWalletTestNetworks()
-
-            return {
-              data: testNetworksEnabled
-            }
-          } catch (error) {
-            return {
-              error: `Unable to fetch isTestNetworksEnabled ${error}`
-            }
-          }
-        },
-        providesTags: ['TestnetsEnabled']
       }),
       getSelectedCoin: query<BraveWallet.CoinType, void>({
         async queryFn (arg, api, extraOptions, baseQuery) {
@@ -637,7 +617,6 @@ export const {
   useGetChainIdForCoinQuery,
   useGetDefaultAccountAddressesQuery,
   useGetERC721MetadataQuery,
-  useGetIsTestNetworksEnabledQuery,
   useGetSelectedAccountAddressQuery,
   useGetSelectedChainIdQuery,
   useGetSelectedCoinQuery,
@@ -651,7 +630,6 @@ export const {
   useLazyGetChainIdForCoinQuery,
   useLazyGetDefaultAccountAddressesQuery,
   useLazyGetERC721MetadataQuery,
-  useLazyGetIsTestNetworksEnabledQuery,
   useLazyGetSelectedAccountAddressQuery,
   useLazyGetSelectedChainIdQuery,
   useLazyGetSelectedCoinQuery,
@@ -679,10 +657,6 @@ async function fetchNetworksList ({
   const { isFilecoinEnabled, isSolanaEnabled } =
     await walletHandler.getWalletInfo()
 
-  // Get isTestNetworkEnabled
-  const { isEnabled: testNetworksEnabled } =
-    await braveWalletService.getShowWalletTestNetworks()
-
   // Get All Networks
   const filteredSupportedCoinTypes = SupportedCoinTypes.filter((coin) => {
     // MULTICHAIN: While we are still in development for FIL and SOL,
@@ -694,34 +668,15 @@ async function fetchNetworksList ({
     )
   })
 
-  const networkLists = await Promise.all(
+  const networks = (await Promise.all(
     filteredSupportedCoinTypes.map(async (coin: BraveWallet.CoinType) => {
       const { networks } = await jsonRpcService.getAllNetworks(coin)
-      return networks
+      const { chainIds: hiddenChains } = await jsonRpcService.getHiddenNetworks(coin)
+      return networks.filter((n) => !hiddenChains.includes(n.chainId))
     })
-  )
+  )).flat(1)
 
-  const flattenedNetworkList = networkLists.flat(1)
-
-  const { chainId: defaultEthChainId } = await jsonRpcService.getChainId(
-    BraveWallet.CoinType.ETH
-  )
-  const { chainIds: hiddenEthNetworkList } =
-    await jsonRpcService.getHiddenNetworks(BraveWallet.CoinType.ETH)
-
-  const networkList = flattenedNetworkList.filter((network) => {
-    if (!testNetworksEnabled) {
-      return !SupportedTestNetworks.includes(network.chainId)
-    }
-
-    return !(
-      network.coin === BraveWallet.CoinType.ETH &&
-      network.chainId !== defaultEthChainId &&
-      hiddenEthNetworkList.includes(network.chainId)
-    )
-  })
-
-  return networkList
+  return networks
 }
 
 async function fetchUserAssetsForNetwork (

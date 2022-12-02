@@ -575,11 +575,6 @@ void BraveWalletService::SetDefaultBaseCryptocurrency(
   }
 }
 
-void BraveWalletService::GetShowWalletTestNetworks(
-    GetShowWalletTestNetworksCallback callback) {
-  std::move(callback).Run(::brave_wallet::GetShowWalletTestNetworks(prefs_));
-}
-
 void BraveWalletService::GetSelectedCoin(GetSelectedCoinCallback callback) {
   std::move(callback).Run(::brave_wallet::GetSelectedCoin(prefs_));
 }

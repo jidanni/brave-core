@@ -77,6 +77,15 @@ std::string GetInfuraProjectID() {
   return project_id;
 }
 
+base::Value::List VectorToValueList(const std::vector<std::string>& strings) {
+  base::Value::List result;
+  for (auto& str : strings) {
+    result.Append(str);
+  }
+
+  return result;
+}
+
 const char kGanacheLocalhostURL[] = "http://localhost:7545/";
 const char kSolanaLocalhostURL[] = "http://localhost:8899/";
 const char kFilecoinLocalhostURL[] = "http://localhost:1234/rpc/v0";
@@ -1229,10 +1238,6 @@ void SetDefaultBaseCryptocurrency(PrefService* prefs,
   prefs->SetString(kDefaultBaseCryptocurrency, cryptocurrency);
 }
 
-bool GetShowWalletTestNetworks(PrefService* prefs) {
-  return prefs->GetBoolean(kShowWalletTestNetworks);
-}
-
 mojom::CoinType GetSelectedCoin(PrefService* prefs) {
   return static_cast<mojom::CoinType>(
       prefs->GetInteger(kBraveWalletSelectedCoin));
@@ -1344,20 +1349,45 @@ void RemoveCustomNetwork(PrefService* prefs,
   });
 }
 
-std::vector<std::string> GetAllHiddenNetworks(PrefService* prefs,
-                                              mojom::CoinType coin) {
+std::vector<std::string> GetDefaultHiddenNetworks(mojom::CoinType coin) {
+  switch (coin) {
+    case mojom::CoinType::ETH:
+      return {brave_wallet::mojom::kGoerliChainId,
+              brave_wallet::mojom::kSepoliaChainId,
+              brave_wallet::mojom::kLocalhostChainId};
+    case mojom::CoinType::FIL:
+      return {brave_wallet::mojom::kFilecoinTestnet,
+              brave_wallet::mojom::kLocalhostChainId};
+    case mojom::CoinType::SOL:
+      return {brave_wallet::mojom::kSolanaDevnet,
+              brave_wallet::mojom::kSolanaTestnet,
+              brave_wallet::mojom::kLocalhostChainId};
+  }
+
+  NOTREACHED();
+  return {};
+}
+
+std::vector<std::string> GetHiddenNetworks(PrefService* prefs,
+                                           mojom::CoinType coin) {
   std::vector<std::string> result;
   const auto& hidden_networks = prefs->GetDict(kBraveWalletHiddenNetworks);
 
-  auto* hidden_eth_networks =
+  auto* hidden_networks_list =
       hidden_networks.FindList(GetPrefKeyForCoinType(coin));
-  if (!hidden_eth_networks)
-    return result;
+  if (!hidden_networks_list)
+    return GetDefaultHiddenNetworks(coin);
 
-  for (const auto& it : *hidden_eth_networks) {
-    auto* chain_id = it.GetIfString();
-    if (chain_id)
-      result.push_back(base::ToLowerASCII(std::move(*chain_id)));
+  // Currently selected chain is never hidden for coin.
+  auto current_chain = GetCurrentChainId(prefs, coin);
+
+  for (const auto& it : *hidden_networks_list) {
+    if (auto* chain_id = it.GetIfString()) {
+      auto chain_id_lower = base::ToLowerASCII(std::move(*chain_id));
+      if (chain_id_lower != current_chain) {
+        result.push_back(std::move(chain_id_lower));
+      }
+    }
   }
 
   return result;
@@ -1368,7 +1398,13 @@ void AddHiddenNetwork(PrefService* prefs,
                       const std::string& chain_id) {
   DictionaryPrefUpdate update(prefs, kBraveWalletHiddenNetworks);
   base::Value::Dict& dict = update.Get()->GetDict();
-  base::Value::List* list = dict.EnsureList(GetPrefKeyForCoinType(coin));
+  base::Value::List* list = dict.FindList(GetPrefKeyForCoinType(coin));
+  if (!list) {
+    list = dict.Set(GetPrefKeyForCoinType(coin),
+                    VectorToValueList(GetDefaultHiddenNetworks(coin)))
+               ->GetIfList();
+  }
+
   std::string chain_id_lower = base::ToLowerASCII(chain_id);
   if (!base::Contains(*list, base::Value(chain_id_lower))) {
     list->Append(chain_id_lower);
@@ -1381,8 +1417,11 @@ void RemoveHiddenNetwork(PrefService* prefs,
   DictionaryPrefUpdate update(prefs, kBraveWalletHiddenNetworks);
   base::Value::Dict& dict = update.Get()->GetDict();
   base::Value::List* list = dict.FindList(GetPrefKeyForCoinType(coin));
-  if (!list)
-    return;
+  if (!list) {
+    list = dict.Set(GetPrefKeyForCoinType(coin),
+                    VectorToValueList(GetDefaultHiddenNetworks(coin)))
+               ->GetIfList();
+  }
   list->EraseIf([&](const base::Value& v) {
     auto* chain_id_string = v.GetIfString();
     if (!chain_id_string)

@@ -611,7 +611,7 @@ void JsonRpcService::GetKnownNetworks(mojom::CoinType coin,
 
 void JsonRpcService::GetHiddenNetworks(mojom::CoinType coin,
                                        GetHiddenNetworksCallback callback) {
-  std::move(callback).Run(GetAllHiddenNetworks(prefs_, coin));
+  std::move(callback).Run(brave_wallet::GetHiddenNetworks(prefs_, coin));
 }
 
 std::string JsonRpcService::GetNetworkUrl(mojom::CoinType coin) const {
