@@ -7,6 +7,7 @@
 
 #include <memory>
 #include <string>
+#include <utility>
 
 #include "brave/browser/ui/toolbar/brave_bookmark_sub_menu_model.h"
 
