@@ -8,10 +8,13 @@
 
 namespace speedreader {
 
-// SpeedreaderResultDelegate is an interface for the speedreader component to
-// notify a tab_helper that the distillation has completed successufully.
-class SpeedreaderResultDelegate {
+// SpeedreaderThrottleDelegate is an interface for the speedreader component to
+// notify a tab_helper.
+class SpeedreaderThrottleDelegate {
  public:
+  virtual ~SpeedreaderThrottleDelegate() = default;
+
+  virtual bool IsPageDistillationAllowed() = 0;
   virtual void OnDistillComplete() = 0;
 };
 
