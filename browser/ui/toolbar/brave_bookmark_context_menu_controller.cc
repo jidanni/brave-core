@@ -77,14 +77,6 @@ void BraveBookmarkContextMenuController::ExecuteCommand(int command_id,
   BookmarkContextMenuController::ExecuteCommand(command_id, event_flags);
 }
 
-bool BraveBookmarkContextMenuController::IsItemForCommandIdDynamic(
-    int command_id) const {
-  if (brave_bookmarks_submenu_model_->GetIndexOfCommandId(command_id))
-    return brave_bookmarks_submenu_model_->IsItemForCommandIdDynamic(
-        command_id);
-  return BookmarkContextMenuController::IsItemForCommandIdDynamic(command_id);
-}
-
 std::u16string BraveBookmarkContextMenuController::GetLabelForCommandId(
     int command_id) const {
   if (brave_bookmarks_submenu_model_->GetIndexOfCommandId(command_id))

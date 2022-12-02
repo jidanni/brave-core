@@ -45,7 +45,7 @@ class BraveBookmarkContextMenuController
   bool IsCommandIdEnabled(int command_id) const override;
   bool IsCommandIdVisible(int command_id) const override;
   void ExecuteCommand(int command_id, int event_flags) override;
-  bool IsItemForCommandIdDynamic(int command_id) const override;
+
   std::u16string GetLabelForCommandId(int command_id) const override;
 
  private:
