@@ -6,7 +6,7 @@ import * as React from 'react'
 import { useSelector } from 'react-redux'
 
 // Constants
-import { WalletState, SerializableTransactionInfo } from '../../../../constants/types'
+import { BraveWallet, WalletState, SerializableTransactionInfo } from '../../../../constants/types'
 
 // Hooks
 import { useExplorer } from '../../../../common/hooks'
@@ -39,12 +39,21 @@ export const TransactionSubmitted = (props: Props) => {
   )
   const onClickViewOnBlockExplorer = useExplorer(selectedNetwork)
 
+  const title = 
+    transaction.txStatus === BraveWallet.TransactionStatus.Submitted 
+      ? getLocale('braveWalletTransactionSubmittedTitle')
+      : getLocale('braveWalletTransactionSignedTitle')
+  const description = 
+    transaction.txStatus === BraveWallet.TransactionStatus.Submitted 
+     ? getLocale('braveWalletTransactionSubmittedDescription')
+     : getLocale('braveWalletTransactionSignedDescription')
+
   return (
     <Panel navAction={onClose} title={headerTitle} headerStyle='slim'>
       <SubmittedIcon />
-      <Title>{getLocale('braveWalletTransactionSubmittedTitle')}</Title>
+      <Title>{title}</Title>
       <TransactionStatusDescription>
-        {getLocale('braveWalletTransactionSubmittedDescription')}
+        {description}
       </TransactionStatusDescription>
       <ButtonRow>
         <DetailButton onClick={onClickViewOnBlockExplorer('tx', transaction.txHash)}>

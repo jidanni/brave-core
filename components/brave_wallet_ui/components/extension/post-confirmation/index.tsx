@@ -61,7 +61,8 @@ export function TransactionStatus (props: Props) {
       ? getLocale('braveWalletButtonClose')
       : getLocale('braveWalletButtonNext')
 
-  if (liveTransaction.txStatus === BraveWallet.TransactionStatus.Submitted) {
+  if (liveTransaction.txStatus === BraveWallet.TransactionStatus.Submitted ||
+      liveTransaction.txStatus === BraveWallet.TransactionStatus.Signed) {
     return (
       <TransactionSubmitted
         headerTitle={parsedTransaction.intent}

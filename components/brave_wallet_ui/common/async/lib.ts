@@ -948,7 +948,9 @@ export async function sendEthTransaction (store: Store, payload: SendEthTransact
     gasLimit: payload.gas || '',
     to: payload.to,
     value: payload.value,
-    data: payload.data || []
+    data: payload.data || [],
+    signOnly: false,
+    signedTransaction: ''
   }
 
   if (isEIP1559) {

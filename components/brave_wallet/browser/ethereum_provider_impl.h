@@ -255,6 +255,7 @@ class EthereumProviderImpl final
                                      base::Value id,
                                      const std::string& normalized_json_request,
                                      const url::Origin& origin,
+                                     bool sign_only,
                                      mojom::NetworkInfoPtr chain);
   void ContinueGetEncryptionPublicKey(
       RequestCallback callback,
@@ -288,6 +289,7 @@ class EthereumProviderImpl final
       const std::string& normalized_json_request,
       const url::Origin& origin,
       mojom::NetworkInfoPtr chain,
+      bool sign_only,
       mojom::KeyringInfoPtr keyring_info);
 
   // content_settings::Observer:
